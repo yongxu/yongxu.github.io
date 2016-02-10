@@ -3,14 +3,10 @@ var path = require('path');
 
 module.exports = {
   entry: [
-    //'webpack-dev-server/client?http://localhost:3000',
-    //'webpack/hot/dev-server',
     './src/index.js' 
   ],
-  devtool: 'eval',
   output: {
     path: path.join(__dirname, 'dist'),
-    publicPath: "/dist/",
     filename: 'bundle.js'
   },
   resolve: {
@@ -19,6 +15,7 @@ module.exports = {
   module: {
     loaders: [{
         test: /\.jsx?$/,
+        exclude: /(node_modules)/,
         loader: 'babel'
       }, {
         test: /\.css$/,
@@ -52,14 +49,14 @@ module.exports = {
       }
     ]
   },
-  devServer: {
-//    contentBase: ".",
-    hot: true,
-    inline: true,
-    port: 3000
+  node: {
+    Buffer: false
   },
+
   plugins: [
-    new webpack.NoErrorsPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    })
   ]
 };
