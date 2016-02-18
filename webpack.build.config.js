@@ -1,9 +1,12 @@
 var webpack = require('webpack');
 var path = require('path');
+var autoprefixer = require('autoprefixer');
+var precss       = require('precss');
+var postcssImport = require('postcss-import');
 
 module.exports = {
   entry: [
-    './src/index.js' 
+    './src/index.js'
   ],
   output: {
     path: path.join(__dirname, 'dist'),
@@ -19,13 +22,8 @@ module.exports = {
         loader: 'babel'
       }, {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: 'style-loader!css-loader!postcss-loader'
       }, {
-        test: /\.scss$/,
-        loaders: ['style', 'css', 'autoprefixer?browsers=last 2 versions',
-          "sass?outputStyle=expanded&"
-        ]
-      },{
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
         loader: "file"
       }, {
@@ -51,6 +49,16 @@ module.exports = {
   },
   node: {
     Buffer: false
+  },
+
+  postcss: function () {
+    return [
+      autoprefixer,
+      precss,
+      postcssImport({
+        addDependencyTo: webpack
+      })
+    ];
   },
 
   plugins: [
