@@ -8,6 +8,7 @@ module.exports = {
   entry: [
     //'webpack-dev-server/client?http://localhost:3000',
     //'webpack/hot/dev-server',
+    'babel-polyfill',
     './src/index.js'
   ],
   devtool: 'eval',
@@ -22,7 +23,7 @@ module.exports = {
   module: {
     loaders: [{
         test: /\.jsx?$/,
-        loader: 'babel'
+        loader: 'babel-loader'
       }, {
         test: /\.css$/,
         loader: 'style-loader!css-loader!postcss-loader'
@@ -39,13 +40,13 @@ module.exports = {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }, {
-        test: /\.gif/,
+        test: /\.gif$/,
         loader: "url-loader?limit=10000&mimetype=image/gif"
       }, {
-        test: /\.jpg/,
+        test: /\.jpg$/,
         loader: "url-loader?limit=10000&mimetype=image/jpg"
       }, {
-        test: /\.png/,
+        test: /\.png$/,
         loader: "url-loader?limit=10000&mimetype=image/png"
       }
     ]
@@ -56,7 +57,7 @@ module.exports = {
     inline: true,
     port: 3000
   },
-  
+
   postcss: function () {
     return [
       autoprefixer,

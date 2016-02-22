@@ -18,8 +18,7 @@ module.exports = {
   module: {
     loaders: [{
         test: /\.jsx?$/,
-        exclude: /(node_modules)/,
-        loader: 'babel'
+        loader: 'babel-loader'
       }, {
         test: /\.css$/,
         loader: 'style-loader!css-loader!postcss-loader'
@@ -36,13 +35,13 @@ module.exports = {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }, {
-        test: /\.gif/,
+        test: /\.gif$/,
         loader: "url-loader?limit=10000&mimetype=image/gif"
       }, {
-        test: /\.jpg/,
+        test: /\.jpg$/,
         loader: "url-loader?limit=10000&mimetype=image/jpg"
       }, {
-        test: /\.png/,
+        test: /\.png$/,
         loader: "url-loader?limit=10000&mimetype=image/png"
       }
     ]
