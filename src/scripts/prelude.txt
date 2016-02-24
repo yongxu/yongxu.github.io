@@ -1,7 +1,21 @@
-/* VOID...... */
-```css
+/* emptiness...... */
 
+```css
+#prelude{
+	color: #1ff042;
+	font-family: 'VT323';
+	font-weight: bold;
+	font-size: 0.9em;
+	letter-spacing: 0.15em;
+	text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
+	line-height: 1;
+	margin-bottom: 0.75em;
+}
+body{
+  background-color: black;
+}
 ```
+
 /*
   Nothing is there.
   Yet, everything is there.
@@ -17,7 +31,7 @@
   the beginning in affiliation with no space, and no time.
 */
 ```js
-  code.says('light');
+  console.log(this)
 ```
 /*
   The beginning is the difference,

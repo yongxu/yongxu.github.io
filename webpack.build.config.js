@@ -6,6 +6,7 @@ var postcssImport = require('postcss-import');
 
 module.exports = {
   entry: [
+    'babel-polyfill',
     './src/index.js'
   ],
   output: {

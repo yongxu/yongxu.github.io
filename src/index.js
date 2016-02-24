@@ -1,18 +1,14 @@
+import React from "react"
+import ReactDOM from "react-dom"
+import DnR from "react-dnr"
 
-import React from "react";
-import ReactDOM from "react-dom";
-import Parser from "./scripts/interpreter"
-import DnR from "react-dnr";
+require('./css/preload.css')
 
-let p = new Parser;
+require('./prelude')()
+.then(()=>console.log('prelude done'))
 
-p.handles.char = c => console.log(c);
-
-p.parse("lolol lol")
-//require('./githubIcon')();
-
-ReactDOM.render((
-	<div>
-		Succeed
-	</div>
-), document.getElementById("main"));
+// ReactDOM.render((
+// 	<div>
+// 		Succeed
+// 	</div>
+// ), document.getElementById("main"))
