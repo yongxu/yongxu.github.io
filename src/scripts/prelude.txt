@@ -1,18 +1,34 @@
 /* emptiness...... */
 
 ```css
+.screen{
+  height: 90vh;
+  padding: 24px 12px;
+  overflow: scroll;
+}
+
+.csscode{
+  font-size: 10px;
+  color: #64d9ef;
+}
+
+body{
+  background-color: black;
+}
+
 #prelude{
-	color: #1ff042;
+	color: #75715e;
 	font-family: 'VT323';
 	font-weight: bold;
-	font-size: 0.9em;
+	font-size: 20px;
 	letter-spacing: 0.15em;
-	text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
 	line-height: 1;
 	margin-bottom: 0.75em;
 }
-body{
-  background-color: black;
+
+.jscode{
+  color: #fd971c;
+  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
 }
 ```
 
