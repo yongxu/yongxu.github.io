@@ -1,1 +1,40 @@
 @import url(https://fonts.googleapis.com/css?family=VT323);
+@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400);
+
+body{
+  margin: 0;
+}
+
+#prelude{
+  min-height: 100vh;
+  min-width: 100%;
+	color: #75715e;
+	font-family: 'VT323';
+	font-size: 16px;
+	letter-spacing: 0.15em;
+  &::-webkit-scrollbar {
+    background: transparent;  /* optional: just make scrollbar invisible */
+  }
+}
+
+.underlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  z-index: -999;
+  pointer-events:none;
+}
+
+.overlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  z-index: 999;
+  pointer-events:none;
+}

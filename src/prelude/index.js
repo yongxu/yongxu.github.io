@@ -10,6 +10,13 @@ export default function(){
     el.id = 'prelude'
     document.body.appendChild(el)
 
+    let underlay = document.createElement('div')
+    underlay.classList.add('underlay')
+    let overlay = document.createElement('div')
+    overlay.classList.add('overlay')
+    el.appendChild(underlay)
+    el.appendChild(overlay)
+
     let screen = document.createElement('div')
     screen.classList.add('screen')
     el.appendChild(screen)

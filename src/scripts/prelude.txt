@@ -1,75 +1,57 @@
-/* emptiness...... */
+/*
+ * yongxu.ren v0.0.x?
+ * All rights protected under YOUR Dignity.
+ */
 
 ```css
+.csscode{
+  font-size: 10px;
+  font-family: 'Source Code Pro';
+  color: #6f6;
+  letter-spacing: unset;
+}
+.overlay{
+  background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);
+  background-size: 1000px 2px;
+}
+#prelude{
+  background: radial-gradient(#222922, #000500);
+}
 .screen{
   height: 90vh;
   padding: 24px 12px;
   overflow: scroll;
 }
+```
 
-.csscode{
-  font-size: 10px;
-  color: #64d9ef;
-}
+  Nothing is here.
 
-body{
-  background-color: black;
-}
+  Yet, here is the beginning,
+  the beginning in affiliation with no space, and no time.
 
-#prelude{
-	color: #75715e;
-	font-family: 'VT323';
-	font-weight: bold;
-	font-size: 20px;
-	letter-spacing: 0.15em;
-	line-height: 1;
-	margin-bottom: 0.75em;
-}
+  The beginning is the difference,
+  and, the beginning creates the difference.
 
+```css
 .jscode{
   color: #fd971c;
+  font-size: 14px;
   text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
 }
 ```
 
-/*
-  Nothing is there.
-  Yet, everything is there.
-  Void contains no difference,
-  all is one,
-  and one is all, is the void.
-*/
-
-/* There is no time, and no space. */
-
-/*
-  But there is the beginning,
-  the beginning in affiliation with no space, and no time.
-*/
 ```js
   console.log(this)
 ```
-/*
-  The beginning is the difference,
-  and, the beginning creates the difference.
-*/
 
-/*
   Yet there is no why,
   there is no how.
   The difference as it is,
-  just as it appears to be, is different from the void.
-*/
+  just as it appears to be, is different from the nothingness.
 
-/*
   The beginning is the origination of binary,
   the one is the void, the other is the difference,
-  with respect of the void.
-*/
+  the derivation of the void.
 
-/*
   The why and how arises after the difference, and its combination,
   or perhaps, the differences beyond the binary.
-*/
-
-/* Then the story begins. */
