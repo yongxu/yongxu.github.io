@@ -19,6 +19,7 @@ export default function(){
 
     let screen = document.createElement('div')
     screen.classList.add('screen')
+    el.id = 'terminal'
     el.appendChild(screen)
     let cssElem = document.createElement('style')
     document.body.appendChild(cssElem)
