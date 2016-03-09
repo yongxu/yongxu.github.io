@@ -5,15 +5,19 @@ body{
   margin: 0;
 }
 
-#prelude{
-  min-height: 100vh;
-  min-width: 100%;
-	color: #75715e;
-	font-family: 'VT323';
+#main{
+  z-index: 1000;
+}
+#terminal{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 	font-size: 16px;
 	letter-spacing: 0.15em;
   &::-webkit-scrollbar {
-    background: transparent;  /* optional: just make scrollbar invisible */
+    background: transparent;
   }
 }
 
@@ -37,4 +41,15 @@ body{
   margin: 0;
   z-index: 999;
   pointer-events:none;
+}
+
+.csscode{
+  font-family: 'Source Code Pro';
+  letter-spacing: unset;
+}
+
+.screen{
+  height: 90vh;
+  overflow: scroll;
+  word-wrap: break-word;
 }

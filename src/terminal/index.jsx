@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import DnR from 'react-dnr';
 
 const defaultTheme = {
@@ -209,7 +208,17 @@ export default class Terminal extends React.Component {
 			onMaximize: ()=>this.refs.dnr.maximize(),
 		});
 	}
+  injectContent(node) {
+    if (this.node) {
+      this.refs.content.removeChild(node)
+    }
+    this.node = node
+    this.refs.content.appendChild(this.node)
+    this.forceUpdate()
+  }
 	render() {
+    let node = this.node
+    let terminal = this
 		return (
       <div>
 				<DnR
@@ -229,9 +238,9 @@ export default class Terminal extends React.Component {
               left: 0,
               bottom: 0,
               right: 0,
+              overflow: 'scroll'
             }}
             ref='content'>
-            innerDiv
           </div>
 				</DnR>
       </div>

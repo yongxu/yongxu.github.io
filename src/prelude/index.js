@@ -7,8 +7,8 @@ export default function(){
   return new Promise(function(resolve, reject){
 
     let el = document.createElement('div')
-    el.id = 'prelude'
-    document.body.appendChild(el)
+    el.id = 'terminal'
+    document.getElementById('prelude').appendChild(el)
 
     let underlay = document.createElement('div')
     underlay.classList.add('underlay')
@@ -19,7 +19,6 @@ export default function(){
 
     let screen = document.createElement('div')
     screen.classList.add('screen')
-    el.id = 'terminal'
     el.appendChild(screen)
     let cssElem = document.createElement('style')
     document.body.appendChild(cssElem)
