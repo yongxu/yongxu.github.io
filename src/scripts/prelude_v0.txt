@@ -4,71 +4,68 @@
  */
 
 ```css
-.screen{
-  height: 90vh;
-  padding: 24px 12px;
-  overflow: scroll;
-}
 .csscode{
   font-size: 10px;
-  color: #64d9ef;
+  color: #6f6;
 }
-body{
-  background-color: black;
+#terminal{
+  font-family: 'VT323';
+  color: #75715e;
+  background: radial-gradient(#222922, #000500);
 }
-#prelude{
-	color: #75715e;
-	font-family: 'VT323';
-	font-weight: bold;
-	font-size: 20px;
-	letter-spacing: 0.15em;
-	line-height: 1;
-	margin-bottom: 0.75em;
+.overlay{
+  background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);
+  background-size: 1000px 2px;
 }
+.screen{
+  padding: 24px 12px;
+}
+```
+
+  Nothing is here.
+
+  Yet, here is the beginning,
+  the beginning in affiliation with no space, and no time.
+
+  The beginning is the difference,
+  and, the beginning creates the difference.
+
+```css
 .jscode{
   color: #fd971c;
+  font-size: 14px;
   text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
 }
 ```
 
-/*
-  Nothing is there.
-  Yet, everything is there.
-  Void contains no difference,
-  all is one,
-  and one is all, is the void.
-*/
-
-/* There is no time, and no space. */
-
-/*
-  But there is the beginning,
-  the beginning in affiliation with no space, and no time.
-*/
-```js
-  console.log(this)
+```printjs
+  let terminalScreen = document.getElementById('terminal')
+  let screen = document.getElementsByClassName("screen")[0]
+  let terminal = ReactDOM.render((
+    <Terminal/>
+  ), document.getElementById("termdock"))
 ```
-/*
-  The beginning is the difference,
-  and, the beginning creates the difference.
-*/
 
-/*
+```mark
+1
+```
+
+```printjs
+  terminal.injectContent(terminalScreen)
+```
+
+```mark
+2
+```
+
   Yet there is no why,
   there is no how.
   The difference as it is,
-  just as it appears to be, is different from the void.
-*/
+  just as it appears to be, is different from the nothingness.
 
-/*
   The beginning is the origination of binary,
   the one is the void, the other is the difference,
-  with respect of the void.
-*/
+  the derivation of the void.
 
-/*
   The why and how arises after the difference, and its combination,
   or perhaps, the differences beyond the binary.
-*/
-
-/* Then the story begins. */

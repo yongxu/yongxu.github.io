@@ -38,8 +38,24 @@
 }
 ```
 
-```js
-  console.log(this)
+```printjs
+  let terminalScreen = document.getElementById('terminal')
+  let screen = document.getElementsByClassName("screen")[0]
+  let terminal = ReactDOM.render((
+    <Terminal/>
+  ), document.getElementById("termdock"))
+```
+
+```mark
+1
+```
+
+```printjs
+  terminal.injectContent(terminalScreen)
+```
+
+```mark
+2
 ```
 
   Yet there is no why,
