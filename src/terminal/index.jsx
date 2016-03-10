@@ -230,6 +230,7 @@ export default class Terminal extends React.Component {
           	height: 300,
           	bottom: 0,
           	right: 0,
+            position: 'fixed',
           	backgroundColor: 'rgba(0, 0, 0, 0.2)'
           }}>
           <div

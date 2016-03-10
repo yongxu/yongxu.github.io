@@ -10,13 +10,14 @@ export default function(){
   return new Promise(function(resolve, reject){
 
     let prelude = document.getElementById('prelude')
-    let termDock = document.createElement('div')
-    termDock.id = 'termdock'
-    prelude.appendChild(termDock)
 
     let el = document.createElement('div')
     el.id = 'terminal'
     prelude.appendChild(el)
+    
+    let termDock = document.createElement('div')
+    termDock.id = 'termdock'
+    prelude.appendChild(termDock)
 
     let underlay = document.createElement('div')
     underlay.classList.add('underlay')
