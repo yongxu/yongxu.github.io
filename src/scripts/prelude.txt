@@ -1,7 +1,10 @@
 /*
- * yongxu.ren v0.0.x?
- * All rights protected under YOUR Dignity.
+ * This is Yongxu Ren's awesome site.
  */
+
+   Nothing is here.
+
+   Yet, here is the beginning.
 
 ```css
 .csscode{
@@ -21,14 +24,13 @@
   padding: 24px 12px;
 }
 ```
+  The beginning in affiliation with no space, and no time.
 
-  Nothing is here.
+  The why and how arises after the difference, and its combination,
+  or perhaps, the differences beyond the binary.
 
-  Yet, here is the beginning,
-  the beginning in affiliation with no space, and no time.
-
-  The beginning is the difference,
-  and, the beginning creates the difference.
+  You probably don't know what I am talking about.
+  Neither do I, but let me show you something, pay attention.
 
 ```css
 .jscode{
@@ -50,6 +52,10 @@
 1
 ```
 
+  Look, we have just made a terminal. You can drag or resize it.
+
+  It will show you some insight behind the magic.
+
 ```printjs
   terminal.injectContent(terminalScreen)
 ```
@@ -57,15 +63,3 @@
 ```mark
 2
 ```
-
-  Yet there is no why,
-  there is no how.
-  The difference as it is,
-  just as it appears to be, is different from the nothingness.
-
-  The beginning is the origination of binary,
-  the one is the void, the other is the difference,
-  the derivation of the void.
-
-  The why and how arises after the difference, and its combination,
-  or perhaps, the differences beyond the binary.

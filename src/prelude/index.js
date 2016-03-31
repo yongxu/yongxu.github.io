@@ -14,7 +14,7 @@ export default function(){
     let el = document.createElement('div')
     el.id = 'terminal'
     prelude.appendChild(el)
-    
+
     let termDock = document.createElement('div')
     termDock.id = 'termdock'
     prelude.appendChild(termDock)
@@ -35,7 +35,7 @@ export default function(){
     let p = new Parser
     p.delay = textSpeed
     p.onFinish = ()=>{
-      resolve(p)
+      resolve({parser:p, terminal: screen})
     }
     let text = ''
     let jsCode = ''
