@@ -119,11 +119,12 @@ export default function(){
             let lastHeight = 0
             setInterval(()=>{
               let screenHeight = el.clientHeight
-              if( screenHeight !== lastHeight) {
-                screen.style.height = (screenHeight-48) + 'px' //substract padding
-                screen.scrollTop = screen.scrollHeight
-              }
-                lastHeight = screenHeight
+              // if( screenHeight !== lastHeight) {
+              //   screen.style.height = (screenHeight-48) + 'px' //substract padding
+              //   screen.scrollTop = screen.scrollHeight
+              // }
+              //   lastHeight = screenHeight
+              screen.style.height = el.clientHeight + 'px'
             },30)
           }
       }

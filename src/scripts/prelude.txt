@@ -60,6 +60,12 @@
   terminal.injectContent(terminalScreen)
 ```
 
+```css
+.screen{
+  overflow-y: scroll;
+}
+```
+
 ```mark
 2
 ```
