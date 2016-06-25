@@ -46,6 +46,8 @@ body{
 .csscode{
   font-family: 'Source Code Pro';
   letter-spacing: unset;
+  font-size: 10px;
+  color: #6f6;
 }
 
 .screen{
@@ -53,4 +55,10 @@ body{
   height: 100vh;
   overflow-y: auto;
   word-wrap: break-word;
+}
+
+.jscode{
+  color: #fd971c;
+  font-size: 14px;
+  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
 }

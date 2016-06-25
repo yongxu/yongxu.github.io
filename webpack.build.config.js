@@ -5,10 +5,7 @@ var precss       = require('precss');
 var postcssImport = require('postcss-import');
 
 module.exports = {
-  entry: [
-    'babel-polyfill',
-    './src/index.js'
-  ],
+  entry: './src/index.js',
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
@@ -19,7 +16,7 @@ module.exports = {
   module: {
     loaders: [{
         test: /\.jsx?$/,
-        loader: 'babel-loader'
+        loader: 'babel'
       }, {
         test: /\.css$/,
         loader: 'style-loader!css-loader!postcss-loader'

@@ -5,12 +5,7 @@ var precss       = require('precss');
 var postcssImport = require('postcss-import');
 
 module.exports = {
-  entry: [
-    //'webpack-dev-server/client?http://localhost:3000',
-    //'webpack/hot/dev-server',
-    'babel-polyfill',
-    './src/index.js'
-  ],
+  entry: './src/index.js',
   //devtool: 'eval',
   devtool: 'source-map',
   output: {
@@ -24,7 +19,9 @@ module.exports = {
   module: {
     loaders: [{
         test: /\.jsx?$/,
-        loader: 'babel-loader'
+        loader: 'babel',
+        "include": path.resolve(__dirname, './src'),
+        exclude: /node_modules/
       }, {
         test: /\.css$/,
         loader: 'style-loader!css-loader!postcss-loader'

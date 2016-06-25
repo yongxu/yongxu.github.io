@@ -7,10 +7,6 @@
    Yet, here is the beginning.
 
 ```css
-.csscode{
-  font-size: 10px;
-  color: #6f6;
-}
 #terminal{
   font-family: 'VT323';
   color: #75715e;
@@ -32,14 +28,6 @@
   You probably don't know what I am talking about.
   Neither do I, but let me show you something, pay attention.
 
-```css
-.jscode{
-  color: #fd971c;
-  font-size: 14px;
-  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}
-```
-
 ```printjs
   let terminalScreen = document.getElementById('terminal')
   let screen = document.getElementsByClassName("screen")[0]
@@ -58,12 +46,6 @@
 
 ```printjs
   terminal.injectContent(terminalScreen)
-```
-
-```css
-.screen{
-  overflow-y: scroll;
-}
 ```
 
 ```mark
