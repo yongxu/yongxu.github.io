@@ -21,13 +21,13 @@ export default function(){
 
     let underlay = document.createElement('div')
     underlay.classList.add('underlay')
-    let overlay = document.createElement('div')
-    overlay.classList.add('overlay')
     el.appendChild(underlay)
-    el.appendChild(overlay)
 
     let screen = document.createElement('div')
     screen.classList.add('screen')
+    let overlay = document.createElement('div')
+    overlay.classList.add('overlay')
+    screen.appendChild(overlay)
     el.appendChild(screen)
     let cssElem = document.createElement('style')
     document.body.appendChild(cssElem)
@@ -118,12 +118,6 @@ export default function(){
             terminal.injectContent(el)
             let lastHeight = 0
             setInterval(()=>{
-              let screenHeight = el.clientHeight
-              // if( screenHeight !== lastHeight) {
-              //   screen.style.height = (screenHeight-48) + 'px' //substract padding
-              //   screen.scrollTop = screen.scrollHeight
-              // }
-              //   lastHeight = screenHeight
               screen.style.height = el.clientHeight + 'px'
             },30)
           }

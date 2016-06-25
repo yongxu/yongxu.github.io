@@ -2,9 +2,9 @@
  * This is Yongxu Ren's awesome site.
  */
 
-   Nothing is here.
+Nothing is here.
 
-   Yet, here is the beginning.
+Yet, here is the beginning.
 
 ```css
 #terminal{
@@ -20,13 +20,13 @@
   padding: 24px 12px;
 }
 ```
-  The beginning in affiliation with no space, and no time.
+The beginning in affiliation with no space, and no time.
 
-  The why and how arises after the difference, and its combination,
-  or perhaps, the differences beyond the binary.
+The why and how arises after the difference, and its combination,
+or perhaps, the differences beyond the binary.
 
-  You probably don't know what I am talking about.
-  Neither do I, but let me show you something, pay attention.
+You probably don't know what I am talking about.
+Neither do I, but let me show you something, pay attention.
 
 ```printjs
   let terminalScreen = document.getElementById('terminal')
@@ -40,9 +40,9 @@
 1
 ```
 
-  Look, we have just made a terminal. You can drag or resize it.
+Look, we have just made a terminal. You can drag or resize it.
 
-  It will show you some insight behind the magic.
+It will show you some insight behind the magic.
 
 ```printjs
   terminal.injectContent(terminalScreen)
