@@ -3,9 +3,11 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Terminal from "../terminal"
 
-const textSpeed = 40
-const jsSpeed = 10
-const cssSpeed = 5
+const interactiveParsing = true
+const textSpeed = interactiveParsing && 40
+const jsSpeed = interactiveParsing && 10
+const cssSpeed = interactiveParsing && 5
+
 export default function(){
   return new Promise(function(resolve, reject){
 

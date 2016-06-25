@@ -1,5 +1,14 @@
 export const lineBreak = /\r\n?|\n|\u2028|\u2029/
 
+
+let i = 0
+export const TOKENS = {
+  TEXT: i++,
+  BLOCK_STARTED: i++,
+  BLOCK: i++,
+  BLOCK_ENDING: i++,
+  CONTROL_STARTING: i++,
+}
 export default class Parser {
   constructor(opts = {}) {
 
@@ -10,39 +19,32 @@ export default class Parser {
     this.position = 0
     this.lineNum = 0
     this.col = 0
-
-    let i = 0
-    this.TOKENS = {
-      TEXT: i++,
-      BLOCK_STARTED: i++,
-      BLOCK: i++,
-      BLOCK_ENDING: i++,
-      CONTROL_STARTING: i++,
-    }
-
   }
 
-  flowControl(parser) {
+  flowControl = (parser) => {
     const {
       done,
       value
     } = parser.next()
-    if (done) {
-      return //finished parsing
-    }
+
+    if (done) return //finished parsing
 
     if (value.type in this.handles) {
       this.handles[value.type](value, this)
     }
-    setTimeout(this.flowControl.bind(this), this.delay, parser)
+
+    if(this.delay) setTimeout(this.flowControl, this.delay, parser)
+    else this.flowControl(parser)
+
   }
 
   parse(text) {
 
     if (text) {
-      this.text = text
-      this.i = 0
-      this.s = this.TOKENS.TEXT
+      this.text = text // the text that waiting to be parsed
+      this.i = 0 // next char to be parsed index position
+      this.s = TOKENS.TEXT // current parser state
+      this.finished = false
     }
 
     let parser = this.parserGenerator()
@@ -72,10 +74,10 @@ export default class Parser {
       this.line = ''
     }
   }
-  
+
   * parserGenerator() {
     const p = this
-    const T = p.TOKENS
+    const T = TOKENS
     p.chunk = ''
     p.line = ''
     while (true) {
@@ -83,24 +85,16 @@ export default class Parser {
       if (c === '') {
         yield * p.emitLine()
         yield * p.emitChunk()
+        p.finished = true
         if (p.onFinish) p.onFinish(p)
         return
       }
-
-      //position tracking
-      p.position++
-        if (c === '\n') {
-          p.lineNum++
-            p.col = 0
-        } else {
-          p.col++
-        }
 
       let pervState = p.s
       switch (p.s) {
         case T.BLOCK:
         case T.TEXT:
-          if (c === '`' && p.text.substr(p.i, 2) === '``') {
+          if (c === '`' && p.text[p.i] === '`' && p.text[p.i+1] === '`') {
             p.s = p.s === T.BLOCK ? T.BLOCK_ENDING : T.BLOCK_STARTED
             p.i += 2
           }
@@ -115,21 +109,24 @@ export default class Parser {
               value: c
             }
             if (c.match(lineBreak)) {
+              p.lineNum++
+              p.col = 0
               yield * p.emitLine()
             } else {
               p.line += c
+              p.col ++
             }
           }
           break
         case T.BLOCK_STARTED:
-          yield * p.emitChunk()
+          if (p.pervState === T.TEXT) yield * p.emitChunk()
           let blockType = ''
-            --p.i //move backward 1
+          --p.i //move backward 1
           while (p.text[p.i] && !p.text.charAt(p.i).match(lineBreak)) {
             blockType += p.text.charAt(p.i++)
           }
           p.i++ //eat line break
-            p.blockType = blockType || 'unknown'
+          p.blockType = blockType || 'unknown'
           yield {
             type: 'blockStarted',
             blockType: p.blockType,
@@ -146,8 +143,14 @@ export default class Parser {
           }
           p.blockType = 'text'
           p.s = T.TEXT
+          break
+        default:
+          throw new Error('Unknown State!')
       }
       p.pervState = pervState
+
+      //position tracking
+      p.position = p.i
     }
   }
 }

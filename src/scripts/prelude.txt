@@ -20,6 +20,7 @@ Yet, here is the beginning.
   padding: 24px 12px;
 }
 ```
+
 The beginning in affiliation with no space, and no time.
 
 The why and how arises after the difference, and its combination,
@@ -35,7 +36,6 @@ Neither do I, but let me show you something, pay attention.
     <Terminal/>
   ), document.getElementById("termdock"))
 ```
-
 ```mark
 1
 ```
@@ -47,7 +47,6 @@ It will show you some insight behind the magic.
 ```printjs
   terminal.injectContent(terminalScreen)
 ```
-
 ```mark
 2
 ```

@@ -50,12 +50,35 @@ body{
   color: #6f6;
 }
 
+$scrollBarColor: #00403E;
+$scrollBarWidth: 8px;
 .screen{
   box-sizing: border-box;
   height: 100vh;
   overflow-y: auto;
   overflow-wrap: break-word;
   /*word-wrap: break-word;*/
+  &::-webkit-scrollbar{
+    width: $scrollBarWidth;
+    background-color: transparent;
+  };
+  &::-webkit-scrollbar-thumb{
+    background-color: $scrollBarColor;
+  }
+  &::-moz-scrollbar{
+    width: $scrollBarWidth;
+    background-color: transparent;
+  };
+  &::-moz-scrollbar-thumb{
+    background-color: $scrollBarColor;
+  }
+  &::-ms-scrollbar{
+    width: $scrollBarWidth;
+    background-color:transparent;
+  };
+  &::-ms-scrollbar-thumb{
+    background-color: $scrollBarColor;
+  }
 }
 
 .jscode{
