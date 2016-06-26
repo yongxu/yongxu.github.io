@@ -52,6 +52,7 @@ body{
 
 $scrollBarColor: #00403E;
 $scrollBarWidth: 8px;
+
 .screen{
   box-sizing: border-box;
   height: 100vh;

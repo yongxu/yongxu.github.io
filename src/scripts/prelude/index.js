@@ -1,7 +1,9 @@
-import Parser from "../shunt"
+import Parser from "shunt"
 import React from "react"
 import ReactDOM from "react-dom"
-import Terminal from "../terminal"
+import Terminal from "terminal"
+
+require('./preload.css')
 
 const interactiveParsing = true
 const textSpeed = interactiveParsing && 40
@@ -45,7 +47,6 @@ export default function(){
     let currentBlockType = 'text'
     let appendedCloseTag = ''
     p.handles.char = (next, parser) => {
-
       switch (next.blockType) {
         case 'js':
         case 'printjs':
@@ -64,7 +65,10 @@ export default function(){
           }
           appendedCloseTag = '</code>'
           break
+
+        //pass through
         case 'mark':
+        case 'text':
         default:
           parser.delay = textSpeed
           if(currentBlockType === 'js'
@@ -110,21 +114,25 @@ export default function(){
         case 'js':
       	  eval(chunk.value)
           break
-        case 'mark':
-          if (chunk.value.includes('1')){
-            terminal = ReactDOM.render((
-              <Terminal/>
-            ), document.getElementById("termdock"))
-          }
-          else if (chunk.value.includes('2')){
-            terminal.injectContent(el)
-            let lastHeight = 0
-            setInterval(()=>{
-              screen.style.height = el.clientHeight + 'px'
-            },30)
-          }
       }
     }
-    p.parse(require('raw!../scripts/prelude.txt'))
+    p.handles.command = (cmd, p) => {
+      console.log(cmd)
+      switch(cmd.value) {
+        case 'initTerminal':
+          terminal = ReactDOM.render((
+            <Terminal/>
+          ), document.getElementById("termdock"))
+          break
+        case 'injectContent':
+          terminal.injectContent(el)
+          let lastHeight = 0
+          setInterval(()=>{
+            screen.style.height = el.clientHeight + 'px'
+          },30)
+          break
+      }
+    }
+    p.parse(require('raw!./prelude.txt'))
   })
 }

@@ -1,13 +1,11 @@
 export const lineBreak = /\r\n?|\n|\u2028|\u2029/
 
-
 let i = 0
 export const TOKENS = {
   TEXT: i++,
   BLOCK_STARTED: i++,
   BLOCK: i++,
-  BLOCK_ENDING: i++,
-  CONTROL_STARTING: i++,
+  BLOCK_ENDING: i++
 }
 export default class Parser {
   constructor(opts = {}) {
@@ -16,6 +14,7 @@ export default class Parser {
     this.delay = opts.delay
     this.handles = Object.assign({}, opts.handles)
     this.blockType = 'text'
+    this.commandChar = opts.commandChar || '@'
     this.position = 0
     this.lineNum = 0
     this.col = 0
@@ -92,15 +91,24 @@ export default class Parser {
 
       let pervState = p.s
       switch (p.s) {
-        case T.BLOCK:
         case T.TEXT:
+        case T.BLOCK:
           if (c === '`' && p.text[p.i] === '`' && p.text[p.i+1] === '`') {
             p.s = p.s === T.BLOCK ? T.BLOCK_ENDING : T.BLOCK_STARTED
             p.i += 2
           }
-          // else if (c === '@' && p.col === 1){
-          //   p.s = T.CONTROL_STARTING
-          // }
+          else if (c === p.commandChar && p.s === T.TEXT){
+            let command = ''
+            while (p.text[p.i] && p.text.charAt(p.i) !== p.commandChar) {
+              command += p.text.charAt(p.i++)
+            }
+            console.log(command)
+            p.i++ //eat command char
+            yield {
+              type: 'command',
+              value: command
+            }
+          }
           else {
             p.chunk += c
             yield {

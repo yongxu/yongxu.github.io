@@ -36,9 +36,7 @@ Neither do I, but let me show you something, pay attention.
     <Terminal/>
   ), document.getElementById("termdock"))
 ```
-```mark
-1
-```
+@initTerminal@
 
 Look, we have just made a terminal. You can drag or resize it.
 
@@ -47,6 +45,4 @@ It will show you some insight behind the magic.
 ```printjs
   terminal.injectContent(terminalScreen)
 ```
-```mark
-2
-```
+@injectContent@

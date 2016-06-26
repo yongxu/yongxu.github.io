@@ -60,8 +60,6 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(288);
-
 	__webpack_require__(145)().then(__webpack_require__(144));
 
 /***/ },
@@ -6665,7 +6663,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.lineBreak = undefined;
+	exports.TOKENS = exports.lineBreak = undefined;
 
 	var _regenerator = __webpack_require__(156);
 
@@ -6687,55 +6685,56 @@
 
 	var lineBreak = exports.lineBreak = /\r\n?|\n|\u2028|\u2029/;
 
+	var i = 0;
+	var TOKENS = exports.TOKENS = {
+	  TEXT: i++,
+	  BLOCK_STARTED: i++,
+	  BLOCK: i++,
+	  BLOCK_ENDING: i++
+	};
+
 	var Parser = function () {
 	  function Parser() {
+	    var _this = this;
+
 	    var opts = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	    (0, _classCallCheck3.default)(this, Parser);
 
-
-	    this.text = opts.text || '';
-	    this.delay = opts.delay;
-	    this.handles = (0, _assign2.default)({}, opts.handles);
-	    this.blockType = 'text';
-	    this.position = 0;
-	    this.lineNum = 0;
-	    this.col = 0;
-
-	    var i = 0;
-	    this.TOKENS = {
-	      TEXT: i++,
-	      BLOCK_STARTED: i++,
-	      BLOCK: i++,
-	      BLOCK_ENDING: i++,
-	      CONTROL_STARTING: i++
-	    };
-	  }
-
-	  (0, _createClass3.default)(Parser, [{
-	    key: 'flowControl',
-	    value: function flowControl(parser) {
+	    this.flowControl = function (parser) {
 	      var _parser$next = parser.next();
 
 	      var done = _parser$next.done;
 	      var value = _parser$next.value;
 
-	      if (done) {
-	        return; //finished parsing
+
+	      if (done) return; //finished parsing
+
+	      if (value.type in _this.handles) {
+	        _this.handles[value.type](value, _this);
 	      }
 
-	      if (value.type in this.handles) {
-	        this.handles[value.type](value, this);
-	      }
-	      setTimeout(this.flowControl.bind(this), this.delay, parser);
-	    }
-	  }, {
+	      if (_this.delay) setTimeout(_this.flowControl, _this.delay, parser);else _this.flowControl(parser);
+	    };
+
+	    this.text = opts.text || '';
+	    this.delay = opts.delay;
+	    this.handles = (0, _assign2.default)({}, opts.handles);
+	    this.blockType = 'text';
+	    this.commandChar = opts.commandChar || '@';
+	    this.position = 0;
+	    this.lineNum = 0;
+	    this.col = 0;
+	  }
+
+	  (0, _createClass3.default)(Parser, [{
 	    key: 'parse',
 	    value: function parse(text) {
 
 	      if (text) {
-	        this.text = text;
-	        this.i = 0;
-	        this.s = this.TOKENS.TEXT;
+	        this.text = text; // the text that waiting to be parsed
+	        this.i = 0; // next char to be parsed index position
+	        this.s = TOKENS.TEXT; // current parser state
+	        this.finished = false;
 	      }
 
 	      var parser = this.parserGenerator();
@@ -6803,27 +6802,27 @@
 	  }, {
 	    key: 'parserGenerator',
 	    value: _regenerator2.default.mark(function parserGenerator() {
-	      var p, T, c, pervState, blockType;
+	      var p, T, c, pervState, command, blockType;
 	      return _regenerator2.default.wrap(function parserGenerator$(_context3) {
 	        while (1) {
 	          switch (_context3.prev = _context3.next) {
 	            case 0:
 	              p = this;
-	              T = p.TOKENS;
+	              T = TOKENS;
 
 	              p.chunk = '';
 	              p.line = '';
 
 	            case 4:
 	              if (false) {
-	                _context3.next = 49;
+	                _context3.next = 64;
 	                break;
 	              }
 
 	              c = p.text.charAt(p.i++);
 
 	              if (!(c === '')) {
-	                _context3.next = 11;
+	                _context3.next = 12;
 	                break;
 	              }
 
@@ -6833,67 +6832,89 @@
 	              return _context3.delegateYield(p.emitChunk(), 't1', 9);
 
 	            case 9:
+	              p.finished = true;
 	              if (p.onFinish) p.onFinish(p);
 	              return _context3.abrupt('return');
 
-	            case 11:
-
-	              //position tracking
-	              p.position++;
-	              if (c === '\n') {
-	                p.lineNum++;
-	                p.col = 0;
-	              } else {
-	                p.col++;
-	              }
-
+	            case 12:
 	              pervState = p.s;
 	              _context3.t2 = p.s;
-	              _context3.next = _context3.t2 === T.BLOCK ? 17 : _context3.t2 === T.TEXT ? 17 : _context3.t2 === T.BLOCK_STARTED ? 31 : _context3.t2 === T.BLOCK_ENDING ? 41 : 46;
+	              _context3.next = _context3.t2 === T.TEXT ? 16 : _context3.t2 === T.BLOCK ? 16 : _context3.t2 === T.BLOCK_STARTED ? 42 : _context3.t2 === T.BLOCK_ENDING ? 53 : 59;
 	              break;
 
-	            case 17:
-	              if (!(c === '`' && p.text.substr(p.i, 2) === '``')) {
-	                _context3.next = 22;
+	            case 16:
+	              if (!(c === '`' && p.text[p.i] === '`' && p.text[p.i + 1] === '`')) {
+	                _context3.next = 21;
 	                break;
 	              }
 
 	              p.s = p.s === T.BLOCK ? T.BLOCK_ENDING : T.BLOCK_STARTED;
 	              p.i += 2;
-	              _context3.next = 30;
+	              _context3.next = 41;
 	              break;
 
-	            case 22:
+	            case 21:
+	              if (!(c === p.commandChar && p.s === T.TEXT)) {
+	                _context3.next = 30;
+	                break;
+	              }
+
+	              command = '';
+
+	              while (p.text[p.i] && p.text.charAt(p.i) !== p.commandChar) {
+	                command += p.text.charAt(p.i++);
+	              }
+	              console.log(command);
+	              p.i++; //eat command char
+	              _context3.next = 28;
+	              return {
+	                type: 'command',
+	                value: command
+	              };
+
+	            case 28:
+	              _context3.next = 41;
+	              break;
+
+	            case 30:
 	              p.chunk += c;
-	              _context3.next = 25;
+	              _context3.next = 33;
 	              return {
 	                type: 'char',
 	                blockType: p.blockType,
 	                value: c
 	              };
 
-	            case 25:
+	            case 33:
 	              if (!c.match(lineBreak)) {
-	                _context3.next = 29;
+	                _context3.next = 39;
 	                break;
 	              }
 
-	              return _context3.delegateYield(p.emitLine(), 't3', 27);
+	              p.lineNum++;
+	              p.col = 0;
+	              return _context3.delegateYield(p.emitLine(), 't3', 37);
 
-	            case 27:
-	              _context3.next = 30;
+	            case 37:
+	              _context3.next = 41;
 	              break;
 
-	            case 29:
+	            case 39:
 	              p.line += c;
+	              p.col++;
 
-	            case 30:
-	              return _context3.abrupt('break', 46);
+	            case 41:
+	              return _context3.abrupt('break', 60);
 
-	            case 31:
-	              return _context3.delegateYield(p.emitChunk(), 't4', 32);
+	            case 42:
+	              if (!(p.pervState === T.TEXT)) {
+	                _context3.next = 44;
+	                break;
+	              }
 
-	            case 32:
+	              return _context3.delegateYield(p.emitChunk(), 't4', 44);
+
+	            case 44:
 	              blockType = '';
 
 	              --p.i; //move backward 1
@@ -6902,38 +6923,45 @@
 	              }
 	              p.i++; //eat line break
 	              p.blockType = blockType || 'unknown';
-	              _context3.next = 39;
+	              _context3.next = 51;
 	              return {
 	                type: 'blockStarted',
 	                blockType: p.blockType,
 	                value: null
 	              };
 
-	            case 39:
+	            case 51:
 	              p.s = T.BLOCK;
-	              return _context3.abrupt('break', 46);
+	              return _context3.abrupt('break', 60);
 
-	            case 41:
-	              return _context3.delegateYield(p.emitChunk(), 't5', 42);
+	            case 53:
+	              return _context3.delegateYield(p.emitChunk(), 't5', 54);
 
-	            case 42:
-	              _context3.next = 44;
+	            case 54:
+	              _context3.next = 56;
 	              return {
 	                type: 'blockEnded',
 	                blockType: p.blockType,
 	                value: null
 	              };
 
-	            case 44:
+	            case 56:
 	              p.blockType = 'text';
 	              p.s = T.TEXT;
+	              return _context3.abrupt('break', 60);
 
-	            case 46:
+	            case 59:
+	              throw new Error('Unknown State!');
+
+	            case 60:
 	              p.pervState = pervState;
+
+	              //position tracking
+	              p.position = p.i;
 	              _context3.next = 4;
 	              break;
 
-	            case 49:
+	            case 64:
 	            case 'end':
 	              return _context3.stop();
 	          }
@@ -12204,7 +12232,6 @@
 	    var currentBlockType = 'text';
 	    var appendedCloseTag = '';
 	    p.handles.char = function (next, parser) {
-
 	      switch (next.blockType) {
 	        case 'js':
 	        case 'printjs':
@@ -12223,7 +12250,10 @@
 	          }
 	          appendedCloseTag = '</code>';
 	          break;
+
+	        //pass through
 	        case 'mark':
+	        case 'text':
 	        default:
 	          parser.delay = textSpeed;
 	          if (currentBlockType === 'js' || currentBlockType === 'css' || currentBlockType === 'printjs') {
@@ -12267,16 +12297,21 @@
 	        case 'js':
 	          eval(chunk.value);
 	          break;
-	        case 'mark':
-	          if (chunk.value.includes('1')) {
-	            terminal = _reactDom2.default.render(_react2.default.createElement(_terminal2.default, null), document.getElementById("termdock"));
-	          } else if (chunk.value.includes('2')) {
-	            terminal.injectContent(el);
-	            var lastHeight = 0;
-	            setInterval(function () {
-	              screen.style.height = el.clientHeight + 'px';
-	            }, 30);
-	          }
+	      }
+	    };
+	    p.handles.command = function (cmd, p) {
+	      console.log(cmd);
+	      switch (cmd.value) {
+	        case 'initTerminal':
+	          terminal = _reactDom2.default.render(_react2.default.createElement(_terminal2.default, null), document.getElementById("termdock"));
+	          break;
+	        case 'injectContent':
+	          terminal.injectContent(el);
+	          var lastHeight = 0;
+	          setInterval(function () {
+	            screen.style.height = el.clientHeight + 'px';
+	          }, 30);
+	          break;
 	      }
 	    };
 	    p.parse(__webpack_require__(218));
@@ -12301,9 +12336,13 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var textSpeed = 40;
-	var jsSpeed = 10;
-	var cssSpeed = 5;
+	__webpack_require__(288);
+
+	var interactiveParsing = true;
+	var textSpeed = interactiveParsing && 40;
+	var jsSpeed = interactiveParsing && 10;
+	var cssSpeed = interactiveParsing && 5;
+
 	module.exports = exports["default"];
 
 /***/ },
@@ -13718,7 +13757,7 @@
 	exports.push([module.id, "@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400);", ""]);
 
 	// module
-	exports.push([module.id, "body{\n  margin: 0;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 16px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n.csscode{\n  font-family: 'Source Code Pro';\n  letter-spacing: unset;\n  font-size: 10px;\n  color: #6f6;\n}\n.screen{\n  box-sizing: border-box;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word;\n  /*word-wrap: break-word;*/\n}\n.jscode{\n  color: #fd971c;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}\n", ""]);
+	exports.push([module.id, "body{\n  margin: 0;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 16px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n.csscode{\n  font-family: 'Source Code Pro';\n  letter-spacing: unset;\n  font-size: 10px;\n  color: #6f6;\n}\n.screen{\n  box-sizing: border-box;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word\n  /*word-wrap: break-word;*/\n}\n.screen::-webkit-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-webkit-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-moz-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-moz-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-ms-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-ms-scrollbar-thumb{\n  background-color: #00403E;\n}\n.jscode{\n  color: #fd971c;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}\n", ""]);
 
 	// exports
 
@@ -14565,7 +14604,7 @@
 /* 218 */
 /***/ function(module, exports) {
 
-	module.exports = "/*\n * This is Yongxu Ren's awesome site.\n */\n\nNothing is here.\n\nYet, here is the beginning.\n\n```css\n#terminal{\n  font-family: 'VT323';\n  color: #75715e;\n  background: radial-gradient(#222922, #000500);\n}\n.overlay{\n  background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);\n  background-size: 1000px 2px;\n}\n.screen{\n  padding: 24px 12px;\n}\n```\nThe beginning in affiliation with no space, and no time.\n\nThe why and how arises after the difference, and its combination,\nor perhaps, the differences beyond the binary.\n\nYou probably don't know what I am talking about.\nNeither do I, but let me show you something, pay attention.\n\n```printjs\n  let terminalScreen = document.getElementById('terminal')\n  let screen = document.getElementsByClassName(\"screen\")[0]\n  let terminal = ReactDOM.render((\n    <Terminal/>\n  ), document.getElementById(\"termdock\"))\n```\n\n```mark\n1\n```\n\nLook, we have just made a terminal. You can drag or resize it.\n\nIt will show you some insight behind the magic.\n\n```printjs\n  terminal.injectContent(terminalScreen)\n```\n\n```mark\n2\n```\n"
+	module.exports = "/*\n * This is Yongxu Ren's awesome site.\n */\n\nNothing is here.\n\nYet, here is the beginning.\n\n```css\n#terminal{\n  font-family: 'VT323';\n  color: #75715e;\n  background: radial-gradient(#222922, #000500);\n}\n.overlay{\n  background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);\n  background-size: 1000px 2px;\n}\n.screen{\n  padding: 24px 12px;\n}\n```\n\nThe beginning in affiliation with no space, and no time.\n\nThe why and how arises after the difference, and its combination,\nor perhaps, the differences beyond the binary.\n\nYou probably don't know what I am talking about.\nNeither do I, but let me show you something, pay attention.\n\n```printjs\n  let terminalScreen = document.getElementById('terminal')\n  let screen = document.getElementsByClassName(\"screen\")[0]\n  let terminal = ReactDOM.render((\n    <Terminal/>\n  ), document.getElementById(\"termdock\"))\n```\n@initTerminal@\n\nLook, we have just made a terminal. You can drag or resize it.\n\nIt will show you some insight behind the magic.\n\n```printjs\n  terminal.injectContent(terminalScreen)\n```\n@injectContent@\n"
 
 /***/ },
 /* 219 */
@@ -25068,8 +25107,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./preload.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./../../node_modules/postcss-loader/index.js!./preload.css");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./preload.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./preload.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
