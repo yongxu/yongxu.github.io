@@ -102,8 +102,8 @@ export default class Parser {
             while (p.text[p.i] && p.text.charAt(p.i) !== p.commandChar) {
               command += p.text.charAt(p.i++)
             }
-            console.log(command)
             p.i++ //eat command char
+            if (p.text[p.i].match(lineBreak)) p.i++ //eat if it is lineBreak
             yield {
               type: 'command',
               value: command
