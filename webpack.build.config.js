@@ -34,16 +34,20 @@ module.exports = {
         loader: "url?limit=10000&mimetype=application/octet-stream"
       }, {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "url?limit=10000&mimetype=image/svg+xml"
+        loader: "url?limit=10000&mimetype=image/svg+xml",
+        include: path.resolve(__dirname, './assets')
       }, {
         test: /\.gif$/,
-        loader: "url-loader?limit=10000&mimetype=image/gif"
+        loader: "url-loader?limit=10000&mimetype=image/gif",
+        include: path.resolve(__dirname, './assets')
       }, {
-        test: /\.jpg$/,
-        loader: "url-loader?limit=10000&mimetype=image/jpg"
+        test: /\.jpe?g$/,
+        loader: "url-loader?limit=10000&mimetype=image/jpg",
+        include: path.resolve(__dirname, './assets')
       }, {
         test: /\.png$/,
-        loader: "url-loader?limit=10000&mimetype=image/png"
+        loader: "url-loader?limit=10000&mimetype=image/png",
+        include: path.resolve(__dirname, './assets')
       }
     ]
   },

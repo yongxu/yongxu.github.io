@@ -82,6 +82,12 @@ $scrollBarWidth: 8px;
   }
 }
 
+.htmlcode{
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
+}
+
 .jscode{
   color: #fd971c;
   font-size: 14px;

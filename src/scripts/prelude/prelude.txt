@@ -4,8 +4,11 @@
 
 Nothing is here.
 
-Yet, here is the beginning.
-
+Yet, here is the beginning, a cat.
+```html
+<img width='200px' height='200px' src='assets/cat_rainbow_halo.jpg'/>
+```
+@image:cat1.jpg@
 ```css
 #terminal{
   font-family: 'VT323';

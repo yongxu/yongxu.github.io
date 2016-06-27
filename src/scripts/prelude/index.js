@@ -9,7 +9,10 @@ const interactiveParsing = true
 const textSpeed = interactiveParsing && 40
 const jsSpeed = interactiveParsing && 10
 const cssSpeed = interactiveParsing && 5
+const htmlSpeed = interactiveParsing && 8
 
+const imageWidth = '200px';
+const imageHeight = '200px';
 export default function(){
   return new Promise(function(resolve, reject){
 
@@ -47,6 +50,14 @@ export default function(){
     let currentBlockType = 'text'
     let appendedCloseTag = ''
     p.handles.char = (next, parser) => {
+      if(currentBlockType !== next.blockType &&
+          (currentBlockType !== 'text'
+        || currentBlockType === 'js'
+        || currentBlockType === 'css'
+        || currentBlockType === 'html'
+        || currentBlockType === 'printjs')){
+        text += '</code>'
+      }
       switch (next.blockType) {
         case 'js':
         case 'printjs':
@@ -65,17 +76,19 @@ export default function(){
           }
           appendedCloseTag = '</code>'
           break
+        case 'html':
+          parser.delay = htmlSpeed
+          if (currentBlockType !== 'html'){
+            text += '<code class="htmlcode">'
+          }
+          appendedCloseTag = '</code>'
+          break
 
         //pass through
         case 'mark':
         case 'text':
         default:
           parser.delay = textSpeed
-          if(currentBlockType === 'js'
-            || currentBlockType === 'css'
-            || currentBlockType === 'printjs'){
-            text += '</code>'
-          }
           appendedCloseTag = ""
       }
 
@@ -102,8 +115,8 @@ export default function(){
           default:
             text += next.value
         }
-        currentBlockType = next.blockType
       }
+      currentBlockType = next.blockType
       screen.innerHTML = text + appendedCloseTag
       screen.scrollTop = screen.scrollHeight
     }
@@ -114,10 +127,13 @@ export default function(){
         case 'js':
       	  eval(chunk.value)
           break
+        case 'html':
+          text += '<div>' + chunk.value + '</div>'
+          screen.innerHTML = text
+          screen.scrollTop = screen.scrollHeight
       }
     }
     p.handles.command = (cmd, p) => {
-      console.log(cmd)
       switch(cmd.value) {
         case 'initTerminal':
           terminal = ReactDOM.render((
@@ -131,7 +147,19 @@ export default function(){
             screen.style.height = el.clientHeight + 'px'
           },30)
           break
+        default:
+          //command with param
+          const [cmdHead, param] = cmd.value.split(':')
+          if (cmdHead && param) {
+            switch(cmdHead) {
+              case 'image':
+                text += `<img width=${imageWidth} height=${imageHeight} src='${'assets/' + param}'/><br>`
+                screen.innerHTML = text
+                break
+            }
+          }
       }
+      screen.scrollTop = screen.scrollHeight
     }
     p.parse(require('raw!./prelude.txt'))
   })
