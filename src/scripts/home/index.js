@@ -3,8 +3,6 @@ import React from "react"
 import ReactDOM from "react-dom"
 import Terminal from "terminal"
 
-export default function({parser,terminal}){
-  return new Promise(function(resolve, reject){
-    parser.parse(require('raw!./home.txt'))
-  })
+export default function(interpreter){
+  return interpreter.run(require('raw!./home.txt'))
 }
