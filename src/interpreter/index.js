@@ -14,6 +14,7 @@ const imageHeight = '200px';
 
 export default class Interpreter {
   constructor(options) {
+    const commandListeners = new Map();
     let app = document.getElementById('app')
 
     let el = document.createElement('div')
@@ -117,7 +118,7 @@ export default class Interpreter {
     }
     // p.handles.line = c => console.log(c)
     let terminal = null
-    p.handles.chunk = (chunk,p) => {
+    p.handles.chunk = (chunk, p) => {
       switch (chunk.blockType){
         case 'js':
       	  eval(chunk.value)
@@ -146,19 +147,21 @@ export default class Interpreter {
         default:
           //command with param
           const [cmdHead, param] = cmd.value.split(':')
-          if (cmdHead && param) {
-            switch(cmdHead) {
-              case 'image':
-                text += `<img width=${imageWidth} height=${imageHeight} src='${'assets/' + param}'/><br>`
-                screen.innerHTML = text
-                break
-            }
+          switch(cmdHead) {
+            case 'image':
+              text += `<img width=${imageWidth} height=${imageHeight} src='${'assets/' + param}'/><br>`
+              screen.innerHTML = text
+              break
+            default:
+              if (commandListeners.has(cmdHead))
+                commandListeners.get(cmdHead)(cmdHead, param, p)
           }
       }
       screen.scrollTop = screen.scrollHeight
     }
 
     this.parser = p
+    this.commandListeners = commandListeners
   }
 
   run(script) {
@@ -168,5 +171,12 @@ export default class Interpreter {
       }
       this.parser.parse(script)
     })
+  }
+
+  addCommandListener(cmd, f) {
+    this.commandListeners.set(cmd, f)
+  }
+  removeCommandListener(cmd) {
+    this.commandListeners.delete(cmd)
   }
 }
