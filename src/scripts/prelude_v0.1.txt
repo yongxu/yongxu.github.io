@@ -1,0 +1,51 @@
+/*
+ * This is Yongxu Ren's awesome site.
+ */
+
+Nothing is here.
+
+Yet, here is the beginning, a cat.
+```html
+<img width='200px' height='200px' src='assets/cat_rainbow_halo.jpg'/>
+```
+@image:cat1.jpg@
+```css
+#terminal{
+  font-family: 'VT323';
+  color: #75715e;
+  background: radial-gradient(#222922, #000500);
+}
+.overlay{
+  background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);
+  background-size: 1000px 2px;
+}
+.screen{
+  padding: 24px 12px;
+}
+```
+
+The beginning in affiliation with no space, and no time.
+
+The why and how arises after the difference, and its combination,
+or perhaps, the differences beyond the binary.
+
+You probably don't know what I am talking about.
+Neither do I, but let me show you something, pay attention.
+
+```printjs
+  let terminalScreen = document.getElementById('terminal')
+  let screen = document.getElementsByClassName("screen")[0]
+  let terminal = ReactDOM.render((
+    <Terminal/>
+  ), document.getElementById("termdock"))
+```
+@initTerminal@
+
+Look, we have just made a terminal. You can drag or resize it.
+
+It will show you some insight behind the magic.
+
+```printjs
+  terminal.injectContent(terminalScreen)
+```
+@injectContent@
