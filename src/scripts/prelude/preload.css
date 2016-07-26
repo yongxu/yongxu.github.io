@@ -5,9 +5,14 @@ body{
   margin: 0;
 }
 
+#app{
+  width: 100vw;
+  height: 100vh;
+}
 #main{
   z-index: 1000;
 }
+
 #terminal{
   position: absolute;
   top: 0;

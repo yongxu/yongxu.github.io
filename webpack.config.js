@@ -27,6 +27,9 @@ module.exports = {
         test: /\.css$/,
         loader: 'style-loader!css-loader!postcss-loader'
       }, {
+        test: /\.scss$/,
+        loader: "style!css!autoprefixer!sass"
+      }, {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
         loader: "file"
       }, {

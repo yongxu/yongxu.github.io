@@ -9,7 +9,6 @@ export const TOKENS = {
 }
 export default class Parser {
   constructor(opts = {}) {
-
     this.text = opts.text || ''
     this.delay = opts.delay
     this.handles = Object.assign({}, opts.handles)

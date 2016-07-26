@@ -121,6 +121,8 @@ export default class Interpreter {
     p.handles.chunk = (chunk, p) => {
       switch (chunk.blockType){
         case 'js':
+          var ctx = this.ctx //use var to avoid babel
+          var context = this.ctx
       	  eval(chunk.value)
           break
         case 'html':
@@ -171,6 +173,10 @@ export default class Interpreter {
       }
       this.parser.parse(script)
     })
+  }
+
+  injectContext(context) {
+    this.ctx = context
   }
 
   addCommandListener(cmd, f) {
