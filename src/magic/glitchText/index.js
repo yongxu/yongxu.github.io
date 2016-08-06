@@ -22,6 +22,6 @@ export default class GlitchText {
   appendText(txt) {
     this.txt = this.txt + txt
     this.text.innerHTML = this.txt;
-    this.text.setAttribute('data-text', txt)
+    this.text.setAttribute('data-text', this.txt)
   }
 }

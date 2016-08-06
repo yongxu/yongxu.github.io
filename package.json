@@ -1,11 +1,12 @@
 {
-  "name": "personal_page",
-  "version": "0.0.0",
+  "name": "yongxu_page",
+  "version": "0.0.1",
   "description": "Yongxu Ren's awesome page",
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.build.config.js ",
-    "start": "webpack-dev-server --progress --colors"
+    "start": "webpack-dev-server --progress --colors",
+    "test": "mocha --compilers js:babel-core/register --recursive ./test"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,9 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-runtime": "^6.9.2",
     "css-loader": "^0.23.1",
+    "expect": "^1.20.2",
     "file-loader": "^0.8.5",
+    "mocha": "^3.0.1",
     "node-sass": "^3.8.0",
     "postcss-import": "^8.0.2",
     "postcss-loader": "^0.9.1",

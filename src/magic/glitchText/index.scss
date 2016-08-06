@@ -3,15 +3,12 @@
 }
 .text{
   @extend %effect;
-  display:inline-block;
+  display: inline-block;
 }
 
 #glitchText{
   font-size:200px;
   position: absolute;
-  width: 100%;
-  height: 100%;
-  width:100px;
   font-family: monospace;
   margin:0 auto;
   @extend %effect;
@@ -27,19 +24,19 @@
     }
   }
 }
-#glitchText:after{
-  content:attr(data-text);
-  position:absolute;
-  left:5px;
-  text-shadow:-1px 0 red;
-  top:0;
-  color:black;
-  background:white;
-  overflow:hidden;
-  clip:rect(0,300px,0,0);
-  font-family: monospace;
-  animation:noise-anim 30s infinite linear alternate-reverse;
-}
+// #glitchText:after{
+//   content:attr(data-text);
+//   position:absolute;
+//   left:5px;
+//   text-shadow:-1px 0 red;
+//   top:0;
+//   color:black;
+//   background:white;
+//   overflow:hidden;
+//   // clip:rect(0,300px,0,0);
+//   font-family: monospace;
+//   animation:noise-anim 30s infinite linear alternate-reverse;
+// }
 
 @keyframes noise-anim-2{
   $steps:30;
@@ -50,16 +47,16 @@
   }
 }
 
-#glitchText:before{
-  content:attr(data-text);
-  position:absolute;
-  left:-5px;
-  text-shadow:1px 0 blue;
-  top:0;
-  color:black;
-  background:0;
-  overflow:hidden;
-  font-family: monospace;
-  clip:rect(0,900px,0,0);
-  animation:noise-anim-2 30s infinite linear alternate-reverse;
-}
+// #glitchText:before{
+//   content:attr(data-text);
+//   position:absolute;
+//   left:-5px;
+//   text-shadow:1px 0 blue;
+//   top:0;
+//   color:black;
+//   background:0;
+//   overflow:hidden;
+//   font-family: monospace;
+//   // clip:rect(0,900px,0,0);
+//   animation:noise-anim-2 30s infinite linear alternate-reverse;
+// }
