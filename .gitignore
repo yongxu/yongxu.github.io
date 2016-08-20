@@ -10,3 +10,6 @@ node_modules/
 # OS files
 .DS_STORE
 .DS_Store
+
+# npm
+npm-debug.log
