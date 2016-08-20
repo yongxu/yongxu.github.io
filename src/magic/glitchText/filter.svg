@@ -1,14 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     version="1.1">
     <defs>
-      <filter id="glitchText">
+      <filter id="glitchFilter">
         <feColorMatrix in="SourceGraphic" mode="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
-        <feOffset in="r" result="r" dx="-7" />
+        <feOffset id="r-offset" in="r" result="r" />
 
         <feColorMatrix in="SourceGraphic" mode="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
-        <feOffset in="g" result="g" dx="-5" dy="1" />
+        <feOffset id="g-offset" in="g" result="g" />
 
         <feColorMatrix in="SourceGraphic" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
-        <feOffset in="b" result="b" dx="5" dy="2" />
+        <feOffset id="b-offset" in="b" result="b" />
 
         <feBlend in="r" in2="g" mode="screen" result="blend" />
         <feBlend in="blend" in2="b" mode="screen" result="blend" />

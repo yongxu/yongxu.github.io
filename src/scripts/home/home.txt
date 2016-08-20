@@ -8,6 +8,7 @@
 
 ```js
   ctx.title.appendText('n')
+  ctx.title.startRandomMotion()
 ```
 
 Ooops......
