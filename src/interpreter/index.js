@@ -1,4 +1,4 @@
-import Parser from "shunt"
+import Parser from "parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import Terminal from "terminal"

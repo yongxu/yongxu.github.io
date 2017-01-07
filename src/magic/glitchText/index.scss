@@ -8,7 +8,9 @@
 
 #glitchText{
   font-size:200px;
-  position: absolute;
+  position: fixed;
+  top: 0px;
+  right: 0px;
   font-family: monospace;
   margin:0 auto;
   @extend %effect;

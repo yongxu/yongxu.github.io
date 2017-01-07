@@ -1,13 +1,14 @@
+
 ```js
   ctx.title.appendText('R')
 ```
 
 ```js
-  ctx.title.appendText('e')
+  ctx.title.appendText('Y')
 ```
 
 ```js
-  ctx.title.appendText('n')
+  ctx.title.appendText('X')
   ctx.title.startRandomMotion()
 ```
 

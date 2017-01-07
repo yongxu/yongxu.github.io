@@ -48,12 +48,12 @@ body{
   pointer-events:none;
 }
 
-.csscode{
+/*.csscode{
   font-family: 'Source Code Pro';
   letter-spacing: unset;
   font-size: 10px;
   color: #6f6;
-}
+}*/
 
 $scrollBarColor: #00403E;
 $scrollBarWidth: 8px;
@@ -86,12 +86,12 @@ $scrollBarWidth: 8px;
     background-color: $scrollBarColor;
   }
 }
-
+/*
 .htmlcode{
   color: white;
   font-size: 14px;
   text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}
+}*/
 
 .jscode{
   color: #fd971c;

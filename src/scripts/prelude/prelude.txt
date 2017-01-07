@@ -1,15 +1,26 @@
 /*
- * This is Yongxu Ren's awesome site.
+ * This is Yongxu Ren's playground.
  */
 
 Nothing is here.
-@tttest:a,b@
-Yet, here is the beginning, a cat.
+Yet, everything is dynamically generated, like this, a cat.
 ```html
 <img width='200px' height='200px' src='assets/cat_rainbow_halo.jpg'/>
 ```
-@image:cat1.jpg@
+The beginning in affiliation with no meaning, and no style.
+Time to add some css.
 ```css
+.htmlcode{
+  color: white;
+  font-size: 14px;
+  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
+}
+.csscode{
+  font-family: 'Source Code Pro';
+  letter-spacing: unset;
+  font-size: 10px;
+  color: #6f6;
+}
 #terminal{
   font-family: 'VT323';
   color: #75715e;
@@ -23,8 +34,6 @@ Yet, here is the beginning, a cat.
   padding: 24px 12px;
 }
 ```
-
-The beginning in affiliation with no space, and no time.
 
 The why and how arises after the difference, and its combination,
 or perhaps, the differences beyond the binary.
