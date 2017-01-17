@@ -3,5 +3,7 @@ import ReactDOM from "react-dom"
 import Terminal from "./terminal"
 import Interpreter from './interpreter'
 
-require('scripts/prelude')(new Interpreter)
+const interpreter = new Interpreter
+window.interpreter = interpreter
+require('scripts/prelude')(interpreter)
 .then(require('scripts/home'))

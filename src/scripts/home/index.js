@@ -1,13 +1,16 @@
+import Parser from "parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import Terminal from "terminal"
 
-require('./index.css')
 import GlitchText from "magic/glitchText"
 
-export default function(interpreter){
-  let app = document.getElementById('app')
+require('./index.css')
 
+export default function(interpreter){
+  document.getElementsByTagName("body")[0]
+  .insertAdjacentHTML('beforeend', '<style>.control{visibility:hidden;}</style>')
+  let app = document.getElementById('app')
   let home = document.createElement('div')
   home.id = 'home'
   app.appendChild(home)

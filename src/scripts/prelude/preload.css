@@ -86,15 +86,22 @@ $scrollBarWidth: 8px;
     background-color: $scrollBarColor;
   }
 }
-/*
-.htmlcode{
+
+.htmlcode {
   color: white;
   font-size: 14px;
   text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}*/
+}
 
-.jscode{
+.control {
+  position: fixed;
+  top: 4px;
+  font-size: 20px;
+  color: eee;
+  right: 100px;
+}
+/*.jscode{
   color: #fd971c;
   font-size: 14px;
   text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}
+}*/

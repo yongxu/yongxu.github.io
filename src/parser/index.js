@@ -12,11 +12,7 @@ export default class Parser {
     this.text = opts.text || ''
     this.delay = opts.delay
     this.handles = Object.assign({}, opts.handles)
-    this.blockType = 'text'
     this.commandChar = opts.commandChar || '@'
-    this.position = 0
-    this.lineNum = 0
-    this.col = 0
   }
 
   flowControl = (parser) => {
@@ -31,24 +27,43 @@ export default class Parser {
       this.handles[value.type](value, this)
     }
 
-    if(this.delay) setTimeout(this.flowControl, this.delay, parser)
-    else this.flowControl(parser)
-
+    if (value.type === 'terminate') return
+    if (this.pause) {
+      this.resume = () => {
+        this.pause = false
+        this.flowControl(parser)
+      }
+      return
+    }
+    if(!this.fastForward && this.delay) setTimeout(this.flowControl, this.delay, parser)
+    else setTimeout(this.flowControl, 0, parser)
   }
 
   parse(text) {
 
     if (text) {
       this.text = text // the text that waiting to be parsed
-      this.i = 0 // next char to be parsed index position
-      this.s = TOKENS.TEXT // current parser state
-      this.finished = false
     }
+
+    this.i = 0 // next char to be parsed index position
+    this.s = TOKENS.TEXT // current parser state
+    this.finished = false
+    this.blockType = 'text'
+    this.position = 0
+    this.lineNum = 0
+    this.col = 0
+    this.fastForward = false
 
     let parser = this.parserGenerator()
 
     this.flowControl(parser)
 
+  }
+
+  addYieldEvent(e) {
+    if (this.yieldEvent) {
+      this.yieldEvent.push(typeof e === 'object' ? e : {type: e})
+    }
   }
 
   * emitChunk() {
@@ -63,7 +78,7 @@ export default class Parser {
   }
 
   * emitLine() {
-    if (this.chunk) {
+    if (this.line) {
       yield {
         type: 'line',
         blockType: this.blockType,
@@ -78,37 +93,50 @@ export default class Parser {
     const T = TOKENS
     p.chunk = ''
     p.line = ''
+    p.terminate = false
+    p.yieldEvent = []
+    let c
     while (true) {
-      let c = p.text.charAt(p.i++)
-      if (c === '') {
-        yield * p.emitLine()
-        yield * p.emitChunk()
-        p.finished = true
-        if (p.onFinish) p.onFinish(p)
-        return
+      if (p.terminate) {
+        return {
+          type: 'terminate'
+        }
       }
-
+      if (p.yieldEvent.length) {
+        while (p.yieldEvent.length) {
+          yield p.yieldEvent.shift()
+        }
+      }
       let pervState = p.s
       switch (p.s) {
         case T.TEXT:
         case T.BLOCK:
+          c = p.text.charAt(p.i++)
+          if (c === '') {
+            yield * p.emitLine()
+            yield * p.emitChunk()
+            p.finished = true
+            p.fastForward = false
+            if (p.onFinish) p.onFinish(p)
+            return
+          }
           if (c === '`' && p.text[p.i] === '`' && p.text[p.i+1] === '`') {
             p.s = p.s === T.BLOCK ? T.BLOCK_ENDING : T.BLOCK_STARTED
             p.i += 2
-          }
-          else if (c === p.commandChar && p.s === T.TEXT){
+          } else if (c === p.commandChar && p.s === T.TEXT){
             let command = ''
             while (p.text[p.i] && p.text.charAt(p.i) !== p.commandChar) {
               command += p.text.charAt(p.i++)
             }
             p.i++ //eat command char
             if (p.text[p.i].match(lineBreak)) p.i++ //eat if it is lineBreak
+            const [cmdHead, ...params] = command.split(':')
             yield {
               type: 'command',
-              value: command
+              command: cmdHead,
+              params
             }
-          }
-          else {
+          } else {
             p.chunk += c
             yield {
               type: 'char',
@@ -128,15 +156,17 @@ export default class Parser {
         case T.BLOCK_STARTED:
           if (p.pervState === T.TEXT) yield * p.emitChunk()
           let blockType = ''
-          --p.i //move backward 1
           while (p.text[p.i] && !p.text.charAt(p.i).match(lineBreak)) {
             blockType += p.text.charAt(p.i++)
           }
-          p.i++ //eat line break
-          p.blockType = blockType || 'unknown'
+          if (p.text[p.i].match(lineBreak)) p.i++ //eat line break
+          const [blockHead, ...params] = blockType.split(':')
+          p.blockType = blockHead || 'unknown'
+          p.params = params
           yield {
             type: 'blockStarted',
             blockType: p.blockType,
+            params,
             value: null
           }
           p.s = T.BLOCK
