@@ -1,58 +1,59 @@
-```span:comment
-/*
- * Hey! Here is Yongxu Ren's playground.
- * Let's begin.
- */
+Looked around, you have, I would say, hmmm?
+```html
+<img height='200px' src='assets/yoda.gif'/>
 ```
-
-@image:cat3.jpg@
-
+```span:comment
+// add, will github icon
+```
 ```js
 ctx.addGithubIcon()
 ```
-```js
-document.getElementsByTagName("body")[0].insertAdjacentHTML('beforeend', `
-<div class='control'>
-<a href='#' onclick="interpreter.skip()">skip</a>
-<a href='#' onclick="interpreter.fastForward()">fast forward</a>
-<a href='#' onclick="interpreter.pause()">pause</a>
-<a href='#' onclick="interpreter.resume()">resume</a>
-</div>`)
-```
+@print:test,test,xxx<br>@
 ```span:comment
-// How about some styles?
+/*
+ * Attaching on upper right, is control buttons,
+ * skip or pause the parser over there, you may.
+ */
+```
+```js
+document.getElementsByTagName("body")[0]
+.insertAdjacentHTML('beforeend', `<div class="control">
+<a href="javascript:interpreter.skip()">skip</a> <a href="javascript:interpreter.fastForward()">fast forward</a>
+<a href="javascript:interpreter.pause()">pause</a> <a href="javascript:interpreter.resume()">resume</a></div>`)
+```
+
+```span:comment
+// Fun this is, yes?
+// Yet, style there is not. Fix it, let us.
 ```
 ```css
 .screen {padding: 24px 12px;}
-.comment {font-family: VT323;}
-.jscode{color: #fd971c; }
-#terminal {font-family: monospace; color: #75715e; background: radial-gradient(#222922, #000500);}
-.overlay {background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);background-size: 1000px 2px;}
-.csscode {font-family: 'Source Code Pro';letter-spacing: unset;color: #6b6;}
+.comment {color: #bc9458; font-style: italic;}
+.jscode{color: #40d8dd; }
+#terminal {color: #eee; background: #000}
+.csscode {color: #e6e1dc;}
 ```
-The why and how arises after the difference, and its combination,
-or perhaps, the differences beyond the binary.
 
-You probably don't know what I am talking about.
-Neither do I, but let me show you something, pay attention.
+Yoda is annoying, you think.
+Massaging Yoda...
+@image:yoda_death.gif@
+Yoda is now dead. The end.
+
+
+Everything you have seen is dynamically generated, like this:
 ```printjs
 let terminalScreen = document.getElementById('terminal')
 let screen = document.getElementsByClassName("screen")[0]
 let terminal = ReactDOM.render((
   <Terminal/>
 ), document.getElementById("termdock"))
-```
 @initTerminal@
-Look, we have just made a terminal. You can drag or resize it.
-
-Everything is dynamically generated, like this, a cat.
-```html
-<img height='200px' src='assets/cat_rainbow_halo.jpg'/>
 ```
-
-It will show you some insight behind the magic.
+You can drag or resize this terminal.
 
 ```printjs
-  terminal.injectContent(terminalScreen)
-```
+terminal.injectContent(terminalScreen)
 @injectContent@
+```
+
+Chapter Introduction Complete!

@@ -14,6 +14,7 @@ const imageHeight = '200px'
 export default class Interpreter {
   constructor(options) {
     const commandListeners = new Map()
+    this.taskQueue = []
     let app = document.getElementById('app')
 
     let el = document.createElement('div')
@@ -32,10 +33,25 @@ export default class Interpreter {
     screen.classList.add('screen')
     let overlay = document.createElement('div')
     overlay.classList.add('overlay')
-    screen.appendChild(overlay)
     el.appendChild(screen)
+    el.appendChild(overlay)
     let cssElem = document.createElement('style')
     document.body.appendChild(cssElem)
+
+    let section
+    let text = ''
+    let currentBlockType = 'text'
+    const cursor = '<span class="parsingCursor"></span>'
+
+    function newSection(eleType, ...classNames) {
+      if (text && section) {
+        section.innerHTML = text
+        text = ''
+      }
+      section = document.createElement(eleType)
+      if (classNames.length) section.classList.add(...classNames)
+      screen.appendChild(section)
+    }
 
     this.ctx = {
       terminate: this.terminate,
@@ -48,56 +64,9 @@ export default class Interpreter {
     }
     let p = new Parser
     p.delay = textSpeed
-    let text = ''
-    let jsCode = ''
-    let currentBlockType = 'text'
-    let appendedCloseTag = ''
     p.handles.char = (next, parser) => {
-      if(currentBlockType !== next.blockType){
-        if (currentBlockType === 'js'
-          || currentBlockType === 'css'
-          || currentBlockType === 'html'
-          || currentBlockType === 'printjs') {
-            text += '</code>'
-          }
-      }
-      switch (next.blockType) {
-        case 'js':
-        case 'printjs':
-          parser.delay = jsSpeed
-          jsCode += next.value
-          if (currentBlockType !== 'js' && currentBlockType !== 'printjs'){
-            text += '<code class="jscode">'
-          }
-          appendedCloseTag = '</code>'
-          break
-        case 'css':
-          parser.delay = cssSpeed
-          cssElem.innerHTML += next.value
-          if (currentBlockType !== 'css'){
-            text += '<code class="csscode">'
-          }
-          appendedCloseTag = '</code>'
-          break
-        case 'html':
-          parser.delay = htmlSpeed
-          if (currentBlockType !== 'html'){
-            text += '<code class="htmlcode">'
-          }
-          appendedCloseTag = '</code>'
-          break
-        //pass through
-        case 'mark':
-        case 'text':
-          parser.delay = textSpeed
-          appendedCloseTag = ""
-          break
-        default:
-          parser.delay = textSpeed
-          break
-      }
-
       if (next.blockType !== 'mark') {
+        if (next.blockType === 'css') cssElem.innerHTML += next.value
         switch (next.value) {
           case '\n':
             text += '<br>'
@@ -122,7 +91,7 @@ export default class Interpreter {
         }
       }
       currentBlockType = next.blockType
-      screen.innerHTML = text + appendedCloseTag
+      section.innerHTML = text + cursor
       screen.scrollTop = screen.scrollHeight
     }
     // p.handles.line = c => console.log(c)
@@ -136,24 +105,21 @@ export default class Interpreter {
           break
         case 'html':
           text += '<div>' + chunk.value + '</div>'
-          screen.innerHTML = text
+          section.innerHTML = text
           screen.scrollTop = screen.scrollHeight
       }
     }
 
     p.handles.line = (line, p) => {
       switch (line.blockType){
-        case 'js':
-        case 'printjs':
-          break
         case 'css':
-          p.delay = 400
+          p.wait(400)
           break
         case 'text':
-          p.delay = 300
+          p.wait(300)
           break
         default:
-          p.delay = 100
+          p.wait(100)
       }
     }
 
@@ -178,12 +144,11 @@ export default class Interpreter {
           break
         case 'image':
           text += `<img height=${imageHeight} src='${'assets/' + cmd.params[0]}'/><br>`
-          screen.innerHTML = text
+          section.innerHTML = text
           break
         case 'print':
-          text += appendedCloseTag + cmd.params[0]
-          appendedCloseTag = ''
-          screen.innerHTML = text
+          text += cmd.raw ? cmd.raw.substr(6) : cmd.params[0]
+          section.innerHTML = text
           break
         default:
           //command with param
@@ -192,36 +157,64 @@ export default class Interpreter {
       }
       screen.scrollTop = screen.scrollHeight
     }
-
+    p.handles.textStarted = (_, p) => {
+      p.delay = textSpeed
+      newSection('div')
+      screen.scrollTop = screen.scrollHeight
+    }
     p.handles.blockStarted = (block, p) => {
-      switch(block.blockType) {
+      switch (block.blockType) {
         case 'span':
-          text += `<span class="${block.params[0]}">`
-          appendedCloseTag = '</code>'
+          p.delay = textSpeed
+          newSection('span', block.params[0])
+          break
+        case 'js':
+        case 'printjs':
+          p.delay = jsSpeed
+          newSection('code', 'jscode')
+          break
+        case 'css':
+          p.delay = cssSpeed
+          newSection('code', 'csslcode')
+          break
+        case 'html':
+          p.delay = htmlSpeed
+          newSection('code', 'htmlcode')
+        case 'text':
+          p.delay = textSpeed
+          newSection('div')
+          break
+        //pass through
+        case 'mark':
+        default:
+          p.delay = textSpeed
           break
       }
-      screen.innerHTML = text
       screen.scrollTop = screen.scrollHeight
+    }
+
+    p.handles.textEnded = (block, p) => {
+      this.clearTask()
     }
 
     p.handles.blockEnded = (block, p) => {
-      switch(block.blockType) {
-        case 'span':
-          text += '</span>'
-          break
-      }
-      screen.innerHTML = text
-      screen.scrollTop = screen.scrollHeight
+      this.clearTask()
     }
 
     p.handles.terminate = (state, p) => {
+      cssElem.innerHTML = `
+      .screen {padding: 24px 12px;}
+      .comment {color: #bc9458; font-style: italic;}
+      .jscode{color: #40d8dd; }
+      #terminal {color: #eee; background: #000}
+      .csscode {color: #e6e1dc;}`
+      this.clearTask()
       this.parser.onFinish(p)
     }
 
     // TODO: not working
     // p.handles.reset = (state, p) => {
     //   text = ''
-    //   jsCode = ''
     //   screen.innerHTML = text
     //   cssElem.innerHTML = ''
     //   currentBlockType = 'text'
@@ -247,6 +240,17 @@ export default class Interpreter {
     this.ctx = {
       ...this.ctx,
       ...context
+    }
+  }
+
+  addTask(task) {
+    this.taskQueue.push(task)
+  }
+
+  clearTask() {
+    while (this.taskQueue.length) {
+      const nextTask = this.taskQueue.unshift()
+      nextTask(this, this.parser)
     }
   }
 
@@ -282,7 +286,7 @@ export default class Interpreter {
     this.parser.addYieldEvent({
       type: 'command',
       command: 'print',
-      params: [`\n<br/>skipped!\n<br/>`]
+      params: [`<br><span class='skippedIntro'>\nIntroduction skipped!</span><br>\n`]
     })
     this.parser.addYieldEvent('terminate')
   }

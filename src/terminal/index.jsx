@@ -226,8 +226,8 @@ export default class Terminal extends React.Component {
           {...this.theme}
           cursorRemap={(c) => c === 'move' ? 'default' : null}
           style={{
-            width: 400,
-            height: 300,
+            width: 500,
+            height: 400,
             bottom: 0,
             right: 0,
             position: 'fixed',

@@ -19,7 +19,7 @@ body{
   right: 0;
   bottom: 0;
   left: 0;
-	font-size: 16px;
+	font-size: 14px;
 	letter-spacing: 0.15em;
   &::-webkit-scrollbar {
     background: transparent;
@@ -48,18 +48,12 @@ body{
   pointer-events:none;
 }
 
-/*.csscode{
-  font-family: 'Source Code Pro';
-  letter-spacing: unset;
-  font-size: 10px;
-  color: #6f6;
-}*/
-
 $scrollBarColor: #00403E;
 $scrollBarWidth: 8px;
 
 .screen{
   box-sizing: border-box;
+  font-family: monospace;
   height: 100vh;
   overflow-y: auto;
   overflow-wrap: break-word;
@@ -100,8 +94,25 @@ $scrollBarWidth: 8px;
   color: eee;
   right: 100px;
 }
-/*.jscode{
-  color: #fd971c;
-  font-size: 14px;
-  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}*/
+
+.skippedIntro {
+  margin: 4px;
+  font-family: 'Source Code Pro';
+  font-size: 20px;
+  color: #ccc;
+}
+
+@keyframes blink {
+    0% {border-left: 3px solid #1718c4;}
+    50% {border-left: 3px solid #1718c4;}
+    51% {border-left: 0px;}
+    100% {border-left: 0px;}
+}
+
+.parsingCursor {
+  border-right: none;
+  width: 0;
+  animation-name: blink;
+  animation-iteration-count: infinite;
+  animation-duration: 1s;
+}
