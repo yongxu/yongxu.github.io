@@ -3492,8 +3492,8 @@
 	              return c === 'move' ? 'default' : null;
 	            },
 	            style: {
-	              width: 400,
-	              height: 300,
+	              width: 500,
+	              height: 400,
 	              bottom: 0,
 	              right: 0,
 	              position: 'fixed',
@@ -7722,13 +7722,19 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var lineBreak = exports.lineBreak = /\r\n?|\n|\u2028|\u2029/;
+	var flatten = function flatten(arr) {
+	  return arr.reduce(function (a, b) {
+	    return a.concat(Array.isArray(b) ? flatten(b) : b);
+	  }, []);
+	};
 
 	var i = 0;
 	var TOKENS = exports.TOKENS = {
 	  TEXT: i++,
 	  BLOCK_STARTED: i++,
 	  BLOCK: i++,
-	  BLOCK_ENDING: i++
+	  BLOCK_ENDING: i++,
+	  READ_NEXT: i++
 	};
 
 	var Parser = function () {
@@ -7745,11 +7751,28 @@
 
 	      if (done) return; //finished parsing
 
+	      if (value.type !== 'char') {
+	        console.log(value);
+	      }
+
+	      if (value.type === 'terminate') {
+	        if (_this.s === TOKENS.BLOCK && 'blockEnded' in _this.handles) {
+	          _this.handles.blockEnded({
+	            type: 'blockEnded',
+	            blockType: _this.blockType,
+	            value: null
+	          }, _this);
+	          _this.blockType = 'text';
+	        }
+	        if ('terminate' in _this.handles) _this.handles.terminate(value, _this);
+
+	        return;
+	      }
+
 	      if (value.type in _this.handles) {
 	        _this.handles[value.type](value, _this);
 	      }
 
-	      if (value.type === 'terminate') return;
 	      if (_this.pause) {
 	        _this.resume = function () {
 	          _this.pause = false;
@@ -7757,7 +7780,10 @@
 	        };
 	        return;
 	      }
-	      if (!_this.fastForward && _this.delay) setTimeout(_this.flowControl, _this.delay, parser);else setTimeout(_this.flowControl, 0, parser);
+	      if (_this.fastForward) setTimeout(_this.flowControl, 0, parser);else if (_this.waitTime) {
+	        setTimeout(_this.flowControl, _this.waitTime, parser);
+	        _this.waitTime = null;
+	      } else if (_this.delay && value.type === 'char') setTimeout(_this.flowControl, _this.delay, parser);else _this.flowControl(parser);
 	    };
 
 	    this.text = opts.text || '';
@@ -7775,7 +7801,7 @@
 	      }
 
 	      this.i = 0; // next char to be parsed index position
-	      this.s = TOKENS.TEXT; // current parser state
+	      this.s = TOKENS.READ_NEXT; // current parser state
 	      this.finished = false;
 	      this.blockType = 'text';
 	      this.position = 0;
@@ -7872,77 +7898,111 @@
 
 	            case 7:
 	              if (false) {
-	                _context3.next = 78;
+	                _context3.next = 95;
 	                break;
 	              }
+
+	              pervState = p.s;
 
 	              if (!p.terminate) {
-	                _context3.next = 10;
+	                _context3.next = 12;
 	                break;
 	              }
 
+	              p.terminate = false;
 	              return _context3.abrupt('return', {
 	                type: 'terminate'
 	              });
 
-	            case 10:
+	            case 12:
 	              if (!p.yieldEvent.length) {
-	                _context3.next = 16;
+	                _context3.next = 18;
 	                break;
 	              }
 
-	            case 11:
+	            case 13:
 	              if (!p.yieldEvent.length) {
-	                _context3.next = 16;
+	                _context3.next = 18;
 	                break;
 	              }
 
-	              _context3.next = 14;
+	              _context3.next = 16;
 	              return p.yieldEvent.shift();
 
-	            case 14:
-	              _context3.next = 11;
-	              break;
-
 	            case 16:
-	              pervState = p.s;
-	              _context3.t0 = p.s;
-	              _context3.next = _context3.t0 === T.TEXT ? 20 : _context3.t0 === T.BLOCK ? 20 : _context3.t0 === T.BLOCK_STARTED ? 55 : _context3.t0 === T.BLOCK_ENDING ? 67 : 73;
+	              _context3.next = 13;
 	              break;
 
-	            case 20:
+	            case 18:
+	              _context3.t0 = p.s;
+	              _context3.next = _context3.t0 === T.TEXT ? 21 : _context3.t0 === T.READ_NEXT ? 21 : _context3.t0 === T.BLOCK ? 21 : _context3.t0 === T.BLOCK_STARTED ? 68 : _context3.t0 === T.BLOCK_ENDING ? 82 : 90;
+	              break;
+
+	            case 21:
 	              c = p.text.charAt(p.i++);
 
 	              if (!(c === '')) {
-	                _context3.next = 28;
+	                _context3.next = 37;
 	                break;
 	              }
 
-	              return _context3.delegateYield(p.emitLine(), 't1', 23);
-
-	            case 23:
-	              return _context3.delegateYield(p.emitChunk(), 't2', 24);
+	              return _context3.delegateYield(p.emitLine(), 't1', 24);
 
 	            case 24:
 	              p.finished = true;
 	              p.fastForward = false;
+
+	              if (!(p.s === T.TEXT)) {
+	                _context3.next = 31;
+	                break;
+	              }
+
+	              _context3.next = 29;
+	              return {
+	                type: 'textEnded',
+	                blockType: p.blockType,
+	                value: p.chunk
+	              };
+
+	            case 29:
+	              _context3.next = 34;
+	              break;
+
+	            case 31:
+	              if (!(p.s === T.BLOCK)) {
+	                _context3.next = 34;
+	                break;
+	              }
+
+	              _context3.next = 34;
+	              return {
+	                type: 'blockEnded',
+	                blockType: p.blockType,
+	                params: p.params,
+	                value: p.chunk
+	              };
+
+	            case 34:
+	              return _context3.delegateYield(p.emitChunk(), 't2', 35);
+
+	            case 35:
 	              if (p.onFinish) p.onFinish(p);
 	              return _context3.abrupt('return');
 
-	            case 28:
+	            case 37:
 	              if (!(c === '`' && p.text[p.i] === '`' && p.text[p.i + 1] === '`')) {
-	                _context3.next = 33;
+	                _context3.next = 42;
 	                break;
 	              }
 
 	              p.s = p.s === T.BLOCK ? T.BLOCK_ENDING : T.BLOCK_STARTED;
 	              p.i += 2;
-	              _context3.next = 54;
+	              _context3.next = 67;
 	              break;
 
-	            case 33:
-	              if (!(c === p.commandChar && p.s === T.TEXT)) {
-	                _context3.next = 43;
+	            case 42:
+	              if (!(c === p.commandChar)) {
+	                _context3.next = 52;
 	                break;
 	              }
 
@@ -7954,56 +8014,82 @@
 	              p.i++; //eat command char
 	              if (p.text[p.i].match(lineBreak)) p.i++; //eat if it is lineBreak
 	              _command$split = command.split(':'), _command$split2 = (0, _toArray3.default)(_command$split), cmdHead = _command$split2[0], _params = _command$split2.slice(1);
-	              _context3.next = 41;
+	              _context3.next = 50;
 	              return {
 	                type: 'command',
-	                command: cmdHead,
-	                params: _params
+	                command: cmdHead.trim(),
+	                raw: command,
+	                params: flatten(_params.map(function (p) {
+	                  return p.split(',');
+	                })).map(function (p) {
+	                  return p.trim();
+	                })
 	              };
 
-	            case 41:
-	              _context3.next = 54;
+	            case 50:
+	              _context3.next = 67;
 	              break;
 
-	            case 43:
+	            case 52:
 	              p.chunk += c;
-	              _context3.next = 46;
+
+	              if (!(p.s === T.READ_NEXT && p.s !== T.BLOCK)) {
+	                _context3.next = 57;
+	                break;
+	              }
+
+	              p.s = T.TEXT;
+	              _context3.next = 57;
+	              return {
+	                type: 'textStarted',
+	                value: null
+	              };
+
+	            case 57:
+	              _context3.next = 59;
 	              return {
 	                type: 'char',
 	                blockType: p.blockType,
 	                value: c
 	              };
 
-	            case 46:
+	            case 59:
 	              if (!c.match(lineBreak)) {
-	                _context3.next = 52;
+	                _context3.next = 65;
 	                break;
 	              }
 
 	              p.lineNum++;
 	              p.col = 0;
-	              return _context3.delegateYield(p.emitLine(), 't3', 50);
+	              return _context3.delegateYield(p.emitLine(), 't3', 63);
 
-	            case 50:
-	              _context3.next = 54;
+	            case 63:
+	              _context3.next = 67;
 	              break;
 
-	            case 52:
+	            case 65:
 	              p.line += c;
 	              p.col++;
 
-	            case 54:
-	              return _context3.abrupt('break', 74);
+	            case 67:
+	              return _context3.abrupt('break', 91);
 
-	            case 55:
+	            case 68:
 	              if (!(p.pervState === T.TEXT)) {
-	                _context3.next = 57;
+	                _context3.next = 72;
 	                break;
 	              }
 
-	              return _context3.delegateYield(p.emitChunk(), 't4', 57);
+	              _context3.next = 71;
+	              return {
+	                type: 'textEnded',
+	                value: p.chunk
+	              };
 
-	            case 57:
+	            case 71:
+	              return _context3.delegateYield(p.emitChunk(), 't4', 72);
+
+	            case 72:
 	              blockType = '';
 
 	              while (p.text[p.i] && !p.text.charAt(p.i).match(lineBreak)) {
@@ -8012,40 +8098,47 @@
 	              if (p.text[p.i].match(lineBreak)) p.i++; //eat line break
 	              _blockType$split = blockType.split(':'), _blockType$split2 = (0, _toArray3.default)(_blockType$split), blockHead = _blockType$split2[0], params = _blockType$split2.slice(1);
 
-	              p.blockType = blockHead || 'unknown';
+	              p.blockType = blockHead && blockHead.trim() || 'unknown';
 	              p.params = params;
-	              _context3.next = 65;
+	              _context3.next = 80;
 	              return {
 	                type: 'blockStarted',
 	                blockType: p.blockType,
-	                params: params,
+	                params: flatten(params.map(function (p) {
+	                  return p.split(',');
+	                })).map(function (p) {
+	                  return p.trim();
+	                }),
 	                value: null
 	              };
 
-	            case 65:
+	            case 80:
 	              p.s = T.BLOCK;
-	              return _context3.abrupt('break', 74);
+	              return _context3.abrupt('break', 91);
 
-	            case 67:
-	              return _context3.delegateYield(p.emitChunk(), 't5', 68);
-
-	            case 68:
-	              _context3.next = 70;
+	            case 82:
+	              if (p.text[p.i].match(lineBreak)) p.i++;
+	              _context3.next = 85;
 	              return {
 	                type: 'blockEnded',
 	                blockType: p.blockType,
-	                value: null
+	                params: p.params,
+	                value: p.chunk
 	              };
 
-	            case 70:
-	              p.blockType = 'text';
-	              p.s = T.TEXT;
-	              return _context3.abrupt('break', 74);
+	            case 85:
+	              return _context3.delegateYield(p.emitChunk(), 't5', 86);
 
-	            case 73:
+	            case 86:
+	              p.params = null;
+	              p.blockType = 'text';
+	              p.s = T.READ_NEXT;
+	              return _context3.abrupt('break', 91);
+
+	            case 90:
 	              throw new Error('Unknown State!');
 
-	            case 74:
+	            case 91:
 	              p.pervState = pervState;
 
 	              //position tracking
@@ -8053,13 +8146,18 @@
 	              _context3.next = 7;
 	              break;
 
-	            case 78:
+	            case 95:
 	            case 'end':
 	              return _context3.stop();
 	          }
 	        }
 	      }, parserGenerator, this);
 	    })
+	  }, {
+	    key: 'wait',
+	    value: function wait(time) {
+	      this.waitTime = time;
+	    }
 	  }]);
 	  return Parser;
 	}();
@@ -11757,7 +11855,7 @@
 	      _this.parser.addYieldEvent({
 	        type: 'command',
 	        command: 'print',
-	        params: ["\n<br/>skipped!\n<br/>"]
+	        params: ["<br><span class='skippedIntro'>\nIntroduction skipped!</span><br>\n"]
 	      });
 	      _this.parser.addYieldEvent('terminate');
 	    };
@@ -11767,6 +11865,7 @@
 	    };
 
 	    var commandListeners = new _map2.default();
+	    this.taskQueue = [];
 	    var app = document.getElementById('app');
 
 	    var el = document.createElement('div');
@@ -11785,10 +11884,32 @@
 	    screen.classList.add('screen');
 	    var overlay = document.createElement('div');
 	    overlay.classList.add('overlay');
-	    screen.appendChild(overlay);
 	    el.appendChild(screen);
+	    el.appendChild(overlay);
 	    var cssElem = document.createElement('style');
 	    document.body.appendChild(cssElem);
+
+	    var section = void 0;
+	    var text = '';
+	    var currentBlockType = 'text';
+	    var cursor = '<span class="parsingCursor"></span>';
+
+	    function newSection(eleType) {
+	      var _section$classList;
+
+	      if (text && section) {
+	        section.innerHTML = text;
+	        text = '';
+	      }
+	      section = document.createElement(eleType);
+
+	      for (var _len = arguments.length, classNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        classNames[_key - 1] = arguments[_key];
+	      }
+
+	      if (classNames.length) (_section$classList = section.classList).add.apply(_section$classList, classNames);
+	      screen.appendChild(section);
+	    }
 
 	    this.ctx = {
 	      terminate: this.terminate,
@@ -11801,53 +11922,9 @@
 	    };
 	    var p = new _parser2.default();
 	    p.delay = textSpeed;
-	    var text = '';
-	    var jsCode = '';
-	    var currentBlockType = 'text';
-	    var appendedCloseTag = '';
 	    p.handles.char = function (next, parser) {
-	      if (currentBlockType !== next.blockType) {
-	        if (currentBlockType === 'js' || currentBlockType === 'css' || currentBlockType === 'html' || currentBlockType === 'printjs') {
-	          text += '</code>';
-	        }
-	      }
-	      switch (next.blockType) {
-	        case 'js':
-	        case 'printjs':
-	          parser.delay = jsSpeed;
-	          jsCode += next.value;
-	          if (currentBlockType !== 'js' && currentBlockType !== 'printjs') {
-	            text += '<code class="jscode">';
-	          }
-	          appendedCloseTag = '</code>';
-	          break;
-	        case 'css':
-	          parser.delay = cssSpeed;
-	          cssElem.innerHTML += next.value;
-	          if (currentBlockType !== 'css') {
-	            text += '<code class="csscode">';
-	          }
-	          appendedCloseTag = '</code>';
-	          break;
-	        case 'html':
-	          parser.delay = htmlSpeed;
-	          if (currentBlockType !== 'html') {
-	            text += '<code class="htmlcode">';
-	          }
-	          appendedCloseTag = '</code>';
-	          break;
-	        //pass through
-	        case 'mark':
-	        case 'text':
-	          parser.delay = textSpeed;
-	          appendedCloseTag = "";
-	          break;
-	        default:
-	          parser.delay = textSpeed;
-	          break;
-	      }
-
 	      if (next.blockType !== 'mark') {
+	        if (next.blockType === 'css') cssElem.innerHTML += next.value;
 	        switch (next.value) {
 	          case '\n':
 	            text += '<br>';
@@ -11872,7 +11949,7 @@
 	        }
 	      }
 	      currentBlockType = next.blockType;
-	      screen.innerHTML = text + appendedCloseTag;
+	      section.innerHTML = text + cursor;
 	      screen.scrollTop = screen.scrollHeight;
 	    };
 	    // p.handles.line = c => console.log(c)
@@ -11886,24 +11963,21 @@
 	          break;
 	        case 'html':
 	          text += '<div>' + chunk.value + '</div>';
-	          screen.innerHTML = text;
+	          section.innerHTML = text;
 	          screen.scrollTop = screen.scrollHeight;
 	      }
 	    };
 
 	    p.handles.line = function (line, p) {
 	      switch (line.blockType) {
-	        case 'js':
-	        case 'printjs':
-	          break;
 	        case 'css':
-	          p.delay = 400;
+	          p.wait(400);
 	          break;
 	        case 'text':
-	          p.delay = 300;
+	          p.wait(300);
 	          break;
 	        default:
-	          p.delay = 100;
+	          p.wait(100);
 	      }
 	    };
 
@@ -11926,12 +12000,11 @@
 	          break;
 	        case 'image':
 	          text += "<img height=" + imageHeight + " src='" + ('assets/' + cmd.params[0]) + "'/><br>";
-	          screen.innerHTML = text;
+	          section.innerHTML = text;
 	          break;
 	        case 'print':
-	          text += appendedCloseTag + cmd.params[0];
-	          appendedCloseTag = '';
-	          screen.innerHTML = text;
+	          text += cmd.raw ? cmd.raw.substr(6) : cmd.params[0];
+	          section.innerHTML = text;
 	          break;
 	        default:
 	          //command with param
@@ -11939,36 +12012,59 @@
 	      }
 	      screen.scrollTop = screen.scrollHeight;
 	    };
-
+	    p.handles.textStarted = function (_, p) {
+	      p.delay = textSpeed;
+	      newSection('div');
+	      screen.scrollTop = screen.scrollHeight;
+	    };
 	    p.handles.blockStarted = function (block, p) {
 	      switch (block.blockType) {
 	        case 'span':
-	          text += "<span class=\"" + block.params[0] + "\">";
-	          appendedCloseTag = '</code>';
+	          p.delay = textSpeed;
+	          newSection('span', block.params[0]);
+	          break;
+	        case 'js':
+	        case 'printjs':
+	          p.delay = jsSpeed;
+	          newSection('code', 'jscode');
+	          break;
+	        case 'css':
+	          p.delay = cssSpeed;
+	          newSection('code', 'csslcode');
+	          break;
+	        case 'html':
+	          p.delay = htmlSpeed;
+	          newSection('code', 'htmlcode');
+	        case 'text':
+	          p.delay = textSpeed;
+	          newSection('div');
+	          break;
+	        //pass through
+	        case 'mark':
+	        default:
+	          p.delay = textSpeed;
 	          break;
 	      }
-	      screen.innerHTML = text;
 	      screen.scrollTop = screen.scrollHeight;
+	    };
+
+	    p.handles.textEnded = function (block, p) {
+	      _this.clearTask();
 	    };
 
 	    p.handles.blockEnded = function (block, p) {
-	      switch (block.blockType) {
-	        case 'span':
-	          text += '</span>';
-	          break;
-	      }
-	      screen.innerHTML = text;
-	      screen.scrollTop = screen.scrollHeight;
+	      _this.clearTask();
 	    };
 
 	    p.handles.terminate = function (state, p) {
+	      cssElem.innerHTML = "\n      .screen {padding: 24px 12px;}\n      .comment {color: #bc9458; font-style: italic;}\n      .jscode{color: #40d8dd; }\n      #terminal {color: #eee; background: #000}\n      .csscode {color: #e6e1dc;}";
+	      _this.clearTask();
 	      _this.parser.onFinish(p);
 	    };
 
 	    // TODO: not working
 	    // p.handles.reset = (state, p) => {
 	    //   text = ''
-	    //   jsCode = ''
 	    //   screen.innerHTML = text
 	    //   cssElem.innerHTML = ''
 	    //   currentBlockType = 'text'
@@ -11997,6 +12093,19 @@
 	    key: "injectContext",
 	    value: function injectContext(context) {
 	      this.ctx = (0, _extends3.default)({}, this.ctx, context);
+	    }
+	  }, {
+	    key: "addTask",
+	    value: function addTask(task) {
+	      this.taskQueue.push(task);
+	    }
+	  }, {
+	    key: "clearTask",
+	    value: function clearTask() {
+	      while (this.taskQueue.length) {
+	        var nextTask = this.taskQueue.unshift();
+	        nextTask(this, this.parser);
+	      }
 	    }
 	  }, {
 	    key: "addCommandListener",
@@ -13938,7 +14047,7 @@
 
 
 	// module
-	exports.push([module.id, ".text, #glitchText {\n  -webkit-filter: url(\"#glitchFilter\");\n          filter: url(\"#glitchFilter\"); }\n\n.text {\n  display: inline-block; }\n\n#glitchText {\n  font-size: 200px;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  font-family: monospace;\n  margin: 0 auto;\n  display: inline-block;\n  text-align: center;\n  color: white; }\n\n@-webkit-keyframes noise-anim {\n  0% {\n    clip: rect(157px, 999px, 13px, 0); }\n  3.33333% {\n    clip: rect(190px, 999px, 122px, 0); }\n  6.66667% {\n    clip: rect(146px, 999px, 179px, 0); }\n  10% {\n    clip: rect(180px, 999px, 83px, 0); }\n  13.33333% {\n    clip: rect(50px, 999px, 21px, 0); }\n  16.66667% {\n    clip: rect(71px, 999px, 87px, 0); }\n  20% {\n    clip: rect(105px, 999px, 30px, 0); }\n  23.33333% {\n    clip: rect(114px, 999px, 63px, 0); }\n  26.66667% {\n    clip: rect(51px, 999px, 107px, 0); }\n  30% {\n    clip: rect(44px, 999px, 89px, 0); }\n  33.33333% {\n    clip: rect(1px, 999px, 102px, 0); }\n  36.66667% {\n    clip: rect(29px, 999px, 67px, 0); }\n  40% {\n    clip: rect(56px, 999px, 14px, 0); }\n  43.33333% {\n    clip: rect(118px, 999px, 151px, 0); }\n  46.66667% {\n    clip: rect(117px, 999px, 77px, 0); }\n  50% {\n    clip: rect(174px, 999px, 102px, 0); }\n  53.33333% {\n    clip: rect(17px, 999px, 51px, 0); }\n  56.66667% {\n    clip: rect(111px, 999px, 161px, 0); }\n  60% {\n    clip: rect(132px, 999px, 115px, 0); }\n  63.33333% {\n    clip: rect(99px, 999px, 127px, 0); }\n  66.66667% {\n    clip: rect(88px, 999px, 90px, 0); }\n  70% {\n    clip: rect(55px, 999px, 166px, 0); }\n  73.33333% {\n    clip: rect(146px, 999px, 43px, 0); }\n  76.66667% {\n    clip: rect(52px, 999px, 151px, 0); }\n  80% {\n    clip: rect(35px, 999px, 7px, 0); }\n  83.33333% {\n    clip: rect(65px, 999px, 106px, 0); }\n  86.66667% {\n    clip: rect(30px, 999px, 113px, 0); }\n  90% {\n    clip: rect(136px, 999px, 16px, 0); }\n  93.33333% {\n    clip: rect(17px, 999px, 26px, 0); }\n  96.66667% {\n    clip: rect(122px, 999px, 63px, 0); }\n  100% {\n    clip: rect(120px, 999px, 106px, 0); } }\n\n@keyframes noise-anim {\n  0% {\n    clip: rect(157px, 999px, 13px, 0); }\n  3.33333% {\n    clip: rect(190px, 999px, 122px, 0); }\n  6.66667% {\n    clip: rect(146px, 999px, 179px, 0); }\n  10% {\n    clip: rect(180px, 999px, 83px, 0); }\n  13.33333% {\n    clip: rect(50px, 999px, 21px, 0); }\n  16.66667% {\n    clip: rect(71px, 999px, 87px, 0); }\n  20% {\n    clip: rect(105px, 999px, 30px, 0); }\n  23.33333% {\n    clip: rect(114px, 999px, 63px, 0); }\n  26.66667% {\n    clip: rect(51px, 999px, 107px, 0); }\n  30% {\n    clip: rect(44px, 999px, 89px, 0); }\n  33.33333% {\n    clip: rect(1px, 999px, 102px, 0); }\n  36.66667% {\n    clip: rect(29px, 999px, 67px, 0); }\n  40% {\n    clip: rect(56px, 999px, 14px, 0); }\n  43.33333% {\n    clip: rect(118px, 999px, 151px, 0); }\n  46.66667% {\n    clip: rect(117px, 999px, 77px, 0); }\n  50% {\n    clip: rect(174px, 999px, 102px, 0); }\n  53.33333% {\n    clip: rect(17px, 999px, 51px, 0); }\n  56.66667% {\n    clip: rect(111px, 999px, 161px, 0); }\n  60% {\n    clip: rect(132px, 999px, 115px, 0); }\n  63.33333% {\n    clip: rect(99px, 999px, 127px, 0); }\n  66.66667% {\n    clip: rect(88px, 999px, 90px, 0); }\n  70% {\n    clip: rect(55px, 999px, 166px, 0); }\n  73.33333% {\n    clip: rect(146px, 999px, 43px, 0); }\n  76.66667% {\n    clip: rect(52px, 999px, 151px, 0); }\n  80% {\n    clip: rect(35px, 999px, 7px, 0); }\n  83.33333% {\n    clip: rect(65px, 999px, 106px, 0); }\n  86.66667% {\n    clip: rect(30px, 999px, 113px, 0); }\n  90% {\n    clip: rect(136px, 999px, 16px, 0); }\n  93.33333% {\n    clip: rect(17px, 999px, 26px, 0); }\n  96.66667% {\n    clip: rect(122px, 999px, 63px, 0); }\n  100% {\n    clip: rect(120px, 999px, 106px, 0); } }\n\n@-webkit-keyframes noise-anim-2 {\n  0% {\n    clip: rect(1403px, 9999px, 855px, 0); }\n  3.33333% {\n    clip: rect(1772px, 9999px, 87px, 0); }\n  6.66667% {\n    clip: rect(1029px, 9999px, 249px, 0); }\n  10% {\n    clip: rect(840px, 9999px, 235px, 0); }\n  13.33333% {\n    clip: rect(1772px, 9999px, 1691px, 0); }\n  16.66667% {\n    clip: rect(1589px, 9999px, 170px, 0); }\n  20% {\n    clip: rect(1133px, 9999px, 78px, 0); }\n  23.33333% {\n    clip: rect(1670px, 9999px, 119px, 0); }\n  26.66667% {\n    clip: rect(1002px, 9999px, 1277px, 0); }\n  30% {\n    clip: rect(444px, 9999px, 1497px, 0); }\n  33.33333% {\n    clip: rect(1371px, 9999px, 1922px, 0); }\n  36.66667% {\n    clip: rect(361px, 9999px, 330px, 0); }\n  40% {\n    clip: rect(687px, 9999px, 594px, 0); }\n  43.33333% {\n    clip: rect(772px, 9999px, 1373px, 0); }\n  46.66667% {\n    clip: rect(511px, 9999px, 660px, 0); }\n  50% {\n    clip: rect(1671px, 9999px, 517px, 0); }\n  53.33333% {\n    clip: rect(1488px, 9999px, 69px, 0); }\n  56.66667% {\n    clip: rect(1027px, 9999px, 79px, 0); }\n  60% {\n    clip: rect(321px, 9999px, 575px, 0); }\n  63.33333% {\n    clip: rect(319px, 9999px, 877px, 0); }\n  66.66667% {\n    clip: rect(885px, 9999px, 1398px, 0); }\n  70% {\n    clip: rect(1481px, 9999px, 136px, 0); }\n  73.33333% {\n    clip: rect(601px, 9999px, 423px, 0); }\n  76.66667% {\n    clip: rect(1232px, 9999px, 1819px, 0); }\n  80% {\n    clip: rect(577px, 9999px, 145px, 0); }\n  83.33333% {\n    clip: rect(891px, 9999px, 550px, 0); }\n  86.66667% {\n    clip: rect(893px, 9999px, 630px, 0); }\n  90% {\n    clip: rect(1275px, 9999px, 1248px, 0); }\n  93.33333% {\n    clip: rect(349px, 9999px, 289px, 0); }\n  96.66667% {\n    clip: rect(1178px, 9999px, 1591px, 0); }\n  100% {\n    clip: rect(480px, 9999px, 598px, 0); } }\n\n@keyframes noise-anim-2 {\n  0% {\n    clip: rect(1403px, 9999px, 855px, 0); }\n  3.33333% {\n    clip: rect(1772px, 9999px, 87px, 0); }\n  6.66667% {\n    clip: rect(1029px, 9999px, 249px, 0); }\n  10% {\n    clip: rect(840px, 9999px, 235px, 0); }\n  13.33333% {\n    clip: rect(1772px, 9999px, 1691px, 0); }\n  16.66667% {\n    clip: rect(1589px, 9999px, 170px, 0); }\n  20% {\n    clip: rect(1133px, 9999px, 78px, 0); }\n  23.33333% {\n    clip: rect(1670px, 9999px, 119px, 0); }\n  26.66667% {\n    clip: rect(1002px, 9999px, 1277px, 0); }\n  30% {\n    clip: rect(444px, 9999px, 1497px, 0); }\n  33.33333% {\n    clip: rect(1371px, 9999px, 1922px, 0); }\n  36.66667% {\n    clip: rect(361px, 9999px, 330px, 0); }\n  40% {\n    clip: rect(687px, 9999px, 594px, 0); }\n  43.33333% {\n    clip: rect(772px, 9999px, 1373px, 0); }\n  46.66667% {\n    clip: rect(511px, 9999px, 660px, 0); }\n  50% {\n    clip: rect(1671px, 9999px, 517px, 0); }\n  53.33333% {\n    clip: rect(1488px, 9999px, 69px, 0); }\n  56.66667% {\n    clip: rect(1027px, 9999px, 79px, 0); }\n  60% {\n    clip: rect(321px, 9999px, 575px, 0); }\n  63.33333% {\n    clip: rect(319px, 9999px, 877px, 0); }\n  66.66667% {\n    clip: rect(885px, 9999px, 1398px, 0); }\n  70% {\n    clip: rect(1481px, 9999px, 136px, 0); }\n  73.33333% {\n    clip: rect(601px, 9999px, 423px, 0); }\n  76.66667% {\n    clip: rect(1232px, 9999px, 1819px, 0); }\n  80% {\n    clip: rect(577px, 9999px, 145px, 0); }\n  83.33333% {\n    clip: rect(891px, 9999px, 550px, 0); }\n  86.66667% {\n    clip: rect(893px, 9999px, 630px, 0); }\n  90% {\n    clip: rect(1275px, 9999px, 1248px, 0); }\n  93.33333% {\n    clip: rect(349px, 9999px, 289px, 0); }\n  96.66667% {\n    clip: rect(1178px, 9999px, 1591px, 0); }\n  100% {\n    clip: rect(480px, 9999px, 598px, 0); } }\n", ""]);
+	exports.push([module.id, ".text, #glitchText {\n  -webkit-filter: url(\"#glitchFilter\");\n          filter: url(\"#glitchFilter\"); }\n\n.text {\n  display: inline-block; }\n\n#glitchText {\n  font-size: 200px;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  font-family: monospace;\n  margin: 0 auto;\n  display: inline-block;\n  text-align: center;\n  color: white; }\n\n@-webkit-keyframes noise-anim {\n  0% {\n    clip: rect(57px, 999px, 78px, 0); }\n  3.33333% {\n    clip: rect(183px, 999px, 5px, 0); }\n  6.66667% {\n    clip: rect(64px, 999px, 181px, 0); }\n  10% {\n    clip: rect(136px, 999px, 10px, 0); }\n  13.33333% {\n    clip: rect(188px, 999px, 192px, 0); }\n  16.66667% {\n    clip: rect(68px, 999px, 162px, 0); }\n  20% {\n    clip: rect(68px, 999px, 40px, 0); }\n  23.33333% {\n    clip: rect(162px, 999px, 155px, 0); }\n  26.66667% {\n    clip: rect(26px, 999px, 10px, 0); }\n  30% {\n    clip: rect(93px, 999px, 151px, 0); }\n  33.33333% {\n    clip: rect(13px, 999px, 133px, 0); }\n  36.66667% {\n    clip: rect(115px, 999px, 155px, 0); }\n  40% {\n    clip: rect(162px, 999px, 55px, 0); }\n  43.33333% {\n    clip: rect(187px, 999px, 185px, 0); }\n  46.66667% {\n    clip: rect(163px, 999px, 173px, 0); }\n  50% {\n    clip: rect(82px, 999px, 151px, 0); }\n  53.33333% {\n    clip: rect(9px, 999px, 97px, 0); }\n  56.66667% {\n    clip: rect(59px, 999px, 176px, 0); }\n  60% {\n    clip: rect(131px, 999px, 11px, 0); }\n  63.33333% {\n    clip: rect(107px, 999px, 185px, 0); }\n  66.66667% {\n    clip: rect(4px, 999px, 3px, 0); }\n  70% {\n    clip: rect(153px, 999px, 183px, 0); }\n  73.33333% {\n    clip: rect(118px, 999px, 146px, 0); }\n  76.66667% {\n    clip: rect(183px, 999px, 112px, 0); }\n  80% {\n    clip: rect(154px, 999px, 122px, 0); }\n  83.33333% {\n    clip: rect(3px, 999px, 8px, 0); }\n  86.66667% {\n    clip: rect(136px, 999px, 147px, 0); }\n  90% {\n    clip: rect(106px, 999px, 141px, 0); }\n  93.33333% {\n    clip: rect(196px, 999px, 78px, 0); }\n  96.66667% {\n    clip: rect(37px, 999px, 139px, 0); }\n  100% {\n    clip: rect(74px, 999px, 32px, 0); } }\n\n@keyframes noise-anim {\n  0% {\n    clip: rect(57px, 999px, 78px, 0); }\n  3.33333% {\n    clip: rect(183px, 999px, 5px, 0); }\n  6.66667% {\n    clip: rect(64px, 999px, 181px, 0); }\n  10% {\n    clip: rect(136px, 999px, 10px, 0); }\n  13.33333% {\n    clip: rect(188px, 999px, 192px, 0); }\n  16.66667% {\n    clip: rect(68px, 999px, 162px, 0); }\n  20% {\n    clip: rect(68px, 999px, 40px, 0); }\n  23.33333% {\n    clip: rect(162px, 999px, 155px, 0); }\n  26.66667% {\n    clip: rect(26px, 999px, 10px, 0); }\n  30% {\n    clip: rect(93px, 999px, 151px, 0); }\n  33.33333% {\n    clip: rect(13px, 999px, 133px, 0); }\n  36.66667% {\n    clip: rect(115px, 999px, 155px, 0); }\n  40% {\n    clip: rect(162px, 999px, 55px, 0); }\n  43.33333% {\n    clip: rect(187px, 999px, 185px, 0); }\n  46.66667% {\n    clip: rect(163px, 999px, 173px, 0); }\n  50% {\n    clip: rect(82px, 999px, 151px, 0); }\n  53.33333% {\n    clip: rect(9px, 999px, 97px, 0); }\n  56.66667% {\n    clip: rect(59px, 999px, 176px, 0); }\n  60% {\n    clip: rect(131px, 999px, 11px, 0); }\n  63.33333% {\n    clip: rect(107px, 999px, 185px, 0); }\n  66.66667% {\n    clip: rect(4px, 999px, 3px, 0); }\n  70% {\n    clip: rect(153px, 999px, 183px, 0); }\n  73.33333% {\n    clip: rect(118px, 999px, 146px, 0); }\n  76.66667% {\n    clip: rect(183px, 999px, 112px, 0); }\n  80% {\n    clip: rect(154px, 999px, 122px, 0); }\n  83.33333% {\n    clip: rect(3px, 999px, 8px, 0); }\n  86.66667% {\n    clip: rect(136px, 999px, 147px, 0); }\n  90% {\n    clip: rect(106px, 999px, 141px, 0); }\n  93.33333% {\n    clip: rect(196px, 999px, 78px, 0); }\n  96.66667% {\n    clip: rect(37px, 999px, 139px, 0); }\n  100% {\n    clip: rect(74px, 999px, 32px, 0); } }\n\n@-webkit-keyframes noise-anim-2 {\n  0% {\n    clip: rect(520px, 9999px, 1344px, 0); }\n  3.33333% {\n    clip: rect(562px, 9999px, 1798px, 0); }\n  6.66667% {\n    clip: rect(565px, 9999px, 272px, 0); }\n  10% {\n    clip: rect(69px, 9999px, 1472px, 0); }\n  13.33333% {\n    clip: rect(264px, 9999px, 14px, 0); }\n  16.66667% {\n    clip: rect(725px, 9999px, 411px, 0); }\n  20% {\n    clip: rect(366px, 9999px, 1050px, 0); }\n  23.33333% {\n    clip: rect(828px, 9999px, 1920px, 0); }\n  26.66667% {\n    clip: rect(1316px, 9999px, 1158px, 0); }\n  30% {\n    clip: rect(1394px, 9999px, 23px, 0); }\n  33.33333% {\n    clip: rect(80px, 9999px, 104px, 0); }\n  36.66667% {\n    clip: rect(1079px, 9999px, 367px, 0); }\n  40% {\n    clip: rect(1587px, 9999px, 1161px, 0); }\n  43.33333% {\n    clip: rect(1836px, 9999px, 888px, 0); }\n  46.66667% {\n    clip: rect(1740px, 9999px, 1719px, 0); }\n  50% {\n    clip: rect(1768px, 9999px, 701px, 0); }\n  53.33333% {\n    clip: rect(607px, 9999px, 1973px, 0); }\n  56.66667% {\n    clip: rect(252px, 9999px, 333px, 0); }\n  60% {\n    clip: rect(92px, 9999px, 550px, 0); }\n  63.33333% {\n    clip: rect(1396px, 9999px, 1906px, 0); }\n  66.66667% {\n    clip: rect(830px, 9999px, 1131px, 0); }\n  70% {\n    clip: rect(1373px, 9999px, 1238px, 0); }\n  73.33333% {\n    clip: rect(105px, 9999px, 53px, 0); }\n  76.66667% {\n    clip: rect(1135px, 9999px, 1597px, 0); }\n  80% {\n    clip: rect(569px, 9999px, 736px, 0); }\n  83.33333% {\n    clip: rect(1667px, 9999px, 736px, 0); }\n  86.66667% {\n    clip: rect(1733px, 9999px, 1796px, 0); }\n  90% {\n    clip: rect(1813px, 9999px, 511px, 0); }\n  93.33333% {\n    clip: rect(1722px, 9999px, 628px, 0); }\n  96.66667% {\n    clip: rect(1594px, 9999px, 477px, 0); }\n  100% {\n    clip: rect(671px, 9999px, 578px, 0); } }\n\n@keyframes noise-anim-2 {\n  0% {\n    clip: rect(520px, 9999px, 1344px, 0); }\n  3.33333% {\n    clip: rect(562px, 9999px, 1798px, 0); }\n  6.66667% {\n    clip: rect(565px, 9999px, 272px, 0); }\n  10% {\n    clip: rect(69px, 9999px, 1472px, 0); }\n  13.33333% {\n    clip: rect(264px, 9999px, 14px, 0); }\n  16.66667% {\n    clip: rect(725px, 9999px, 411px, 0); }\n  20% {\n    clip: rect(366px, 9999px, 1050px, 0); }\n  23.33333% {\n    clip: rect(828px, 9999px, 1920px, 0); }\n  26.66667% {\n    clip: rect(1316px, 9999px, 1158px, 0); }\n  30% {\n    clip: rect(1394px, 9999px, 23px, 0); }\n  33.33333% {\n    clip: rect(80px, 9999px, 104px, 0); }\n  36.66667% {\n    clip: rect(1079px, 9999px, 367px, 0); }\n  40% {\n    clip: rect(1587px, 9999px, 1161px, 0); }\n  43.33333% {\n    clip: rect(1836px, 9999px, 888px, 0); }\n  46.66667% {\n    clip: rect(1740px, 9999px, 1719px, 0); }\n  50% {\n    clip: rect(1768px, 9999px, 701px, 0); }\n  53.33333% {\n    clip: rect(607px, 9999px, 1973px, 0); }\n  56.66667% {\n    clip: rect(252px, 9999px, 333px, 0); }\n  60% {\n    clip: rect(92px, 9999px, 550px, 0); }\n  63.33333% {\n    clip: rect(1396px, 9999px, 1906px, 0); }\n  66.66667% {\n    clip: rect(830px, 9999px, 1131px, 0); }\n  70% {\n    clip: rect(1373px, 9999px, 1238px, 0); }\n  73.33333% {\n    clip: rect(105px, 9999px, 53px, 0); }\n  76.66667% {\n    clip: rect(1135px, 9999px, 1597px, 0); }\n  80% {\n    clip: rect(569px, 9999px, 736px, 0); }\n  83.33333% {\n    clip: rect(1667px, 9999px, 736px, 0); }\n  86.66667% {\n    clip: rect(1733px, 9999px, 1796px, 0); }\n  90% {\n    clip: rect(1813px, 9999px, 511px, 0); }\n  93.33333% {\n    clip: rect(1722px, 9999px, 628px, 0); }\n  96.66667% {\n    clip: rect(1594px, 9999px, 477px, 0); }\n  100% {\n    clip: rect(671px, 9999px, 578px, 0); } }\n", ""]);
 
 	// exports
 
@@ -13967,7 +14076,7 @@
 	exports.push([module.id, "@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400);", ""]);
 
 	// module
-	exports.push([module.id, "body{\n  margin: 0;\n}\n#app{\n  width: 100vw;\n  height: 100vh;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 16px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n/*.csscode{\n  font-family: 'Source Code Pro';\n  letter-spacing: unset;\n  font-size: 10px;\n  color: #6f6;\n}*/\n.screen{\n  box-sizing: border-box;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word\n  /*word-wrap: break-word;*/\n}\n.screen::-webkit-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-webkit-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-moz-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-moz-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-ms-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-ms-scrollbar-thumb{\n  background-color: #00403E;\n}\n.htmlcode {\n  color: white;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}\n.control {\n  position: fixed;\n  top: 4px;\n  font-size: 20px;\n  color: eee;\n  right: 100px;\n}\n/*.jscode{\n  color: #fd971c;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}*/\n", ""]);
+	exports.push([module.id, "body{\n  margin: 0;\n}\n#app{\n  width: 100vw;\n  height: 100vh;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 14px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n.screen{\n  box-sizing: border-box;\n  font-family: monospace;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word\n  /*word-wrap: break-word;*/\n}\n.screen::-webkit-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-webkit-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-moz-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-moz-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-ms-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-ms-scrollbar-thumb{\n  background-color: #00403E;\n}\n.htmlcode {\n  color: white;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}\n.control {\n  position: fixed;\n  top: 4px;\n  font-size: 20px;\n  color: eee;\n  right: 100px;\n}\n.skippedIntro {\n  margin: 4px;\n  font-family: 'Source Code Pro';\n  font-size: 20px;\n  color: #ccc;\n}\n@-webkit-keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n@keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n.parsingCursor {\n  border-right: none;\n  width: 0;\n  -webkit-animation-name: blink;\n          animation-name: blink;\n  -webkit-animation-iteration-count: infinite;\n          animation-iteration-count: infinite;\n  -webkit-animation-duration: 1s;\n          animation-duration: 1s;\n}\n", ""]);
 
 	// exports
 
@@ -14643,13 +14752,13 @@
 /* 232 */
 /***/ function(module, exports) {
 
-	module.exports = "```js\n  ctx.title.appendText('R')\n```\n```js\n  ctx.title.appendText('Y')\n```\n```js\n  ctx.title.appendText('X')\n```\n```js\n  ctx.title.startRandomMotion()\n```\n\nOoops......\n\n```js\n  console.log(\"The tripleDosedSpaceBananaCat is drifting away.....\")\n```\n\nThis page is still under construction.......\n\nPlease come back shortly. :(\n"
+	module.exports = "```js\n  ctx.title.appendText('R')\n```\n\n```js\n  ctx.title.appendText('Y')\n```\n\n```js\n  ctx.title.appendText('X')\n```\n\n```js\n  ctx.title.startRandomMotion()\n```\n\nOoops......\n\n```js\n  console.log(\"The tripleDosedSpaceBananaCat is drifting away.....\")\n```\n\nThis page is still under construction.......\n"
 
 /***/ },
 /* 233 */
 /***/ function(module, exports) {
 
-	module.exports = "```span:comment\n/*\n * Hey! Here is Yongxu Ren's playground.\n * Let's begin.\n */\n```\n\n@image:cat3.jpg@\n\n```js\nctx.addGithubIcon()\n```\n```js\ndocument.getElementsByTagName(\"body\")[0].insertAdjacentHTML('beforeend', `\n<div class='control'>\n<a href='#' onclick=\"interpreter.skip()\">skip</a>\n<a href='#' onclick=\"interpreter.fastForward()\">fast forward</a>\n<a href='#' onclick=\"interpreter.pause()\">pause</a>\n<a href='#' onclick=\"interpreter.resume()\">resume</a>\n</div>`)\n```\n```span:comment\n// How about some styles?\n```\n```css\n.screen {padding: 24px 12px;}\n.comment {font-family: VT323;}\n.jscode{color: #fd971c; }\n#terminal {font-family: monospace; color: #75715e; background: radial-gradient(#222922, #000500);}\n.overlay {background-image: linear-gradient(transparent 0%, rgba(10, 16, 10, 0.3) 50%);background-size: 1000px 2px;}\n.csscode {font-family: 'Source Code Pro';letter-spacing: unset;color: #6b6;}\n```\nThe why and how arises after the difference, and its combination,\nor perhaps, the differences beyond the binary.\n\nYou probably don't know what I am talking about.\nNeither do I, but let me show you something, pay attention.\n```printjs\nlet terminalScreen = document.getElementById('terminal')\nlet screen = document.getElementsByClassName(\"screen\")[0]\nlet terminal = ReactDOM.render((\n  <Terminal/>\n), document.getElementById(\"termdock\"))\n```\n@initTerminal@\nLook, we have just made a terminal. You can drag or resize it.\n\nEverything is dynamically generated, like this, a cat.\n```html\n<img height='200px' src='assets/cat_rainbow_halo.jpg'/>\n```\n\nIt will show you some insight behind the magic.\n\n```printjs\n  terminal.injectContent(terminalScreen)\n```\n@injectContent@\n"
+	module.exports = "Looked around, you have, I would say, hmmm?\n```html\n<img height='200px' src='assets/yoda.gif'/>\n```\n```span:comment\n// add, will github icon\n```\n```js\nctx.addGithubIcon()\n```\n@print:test,test,xxx<br>@\n```span:comment\n/*\n * Attaching on upper right, is control buttons,\n * skip or pause the parser over there, you may.\n */\n```\n```js\ndocument.getElementsByTagName(\"body\")[0]\n.insertAdjacentHTML('beforeend', `<div class=\"control\">\n<a href=\"javascript:interpreter.skip()\">skip</a> <a href=\"javascript:interpreter.fastForward()\">fast forward</a>\n<a href=\"javascript:interpreter.pause()\">pause</a> <a href=\"javascript:interpreter.resume()\">resume</a></div>`)\n```\n\n```span:comment\n// Fun this is, yes?\n// Yet, style there is not. Fix it, let us.\n```\n```css\n.screen {padding: 24px 12px;}\n.comment {color: #bc9458; font-style: italic;}\n.jscode{color: #40d8dd; }\n#terminal {color: #eee; background: #000}\n.csscode {color: #e6e1dc;}\n```\n\nYoda is annoying, you think.\nMassaging Yoda...\n@image:yoda_death.gif@\nYoda is now dead. The end.\n\n\nEverything you have seen is dynamically generated, like this:\n```printjs\nlet terminalScreen = document.getElementById('terminal')\nlet screen = document.getElementsByClassName(\"screen\")[0]\nlet terminal = ReactDOM.render((\n  <Terminal/>\n), document.getElementById(\"termdock\"))\n@initTerminal@\n```\nYou can drag or resize this terminal.\n\n```printjs\nterminal.injectContent(terminalScreen)\n@injectContent@\n```\n\nChapter Introduction Complete!\n"
 
 /***/ },
 /* 234 */
