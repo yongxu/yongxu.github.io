@@ -11840,10 +11840,12 @@
 	    };
 
 	    this.fastForward = function () {
+	      _this.parser.pause && _this.parser.resume();
 	      _this.parser.fastForward = true;
 	    };
 
 	    this.skip = function () {
+	      _this.parser.pause && _this.parser.resume();
 	      _this.parser.addYieldEvent({
 	        type: 'command',
 	        command: 'initTerminal'
@@ -11923,30 +11925,28 @@
 	    var p = new _parser2.default();
 	    p.delay = textSpeed;
 	    p.handles.char = function (next, parser) {
-	      if (next.blockType !== 'mark') {
-	        if (next.blockType === 'css') cssElem.innerHTML += next.value;
-	        switch (next.value) {
-	          case '\n':
-	            text += '<br>';
-	            break;
-	          case ' ':
-	            text += '&nbsp;';
-	            break;
-	          case '\t':
-	            text += '&nbsp;&nbsp;';
-	            break;
-	          case '<':
-	            text += '&lt;';
-	            break;
-	          case '>':
-	            text += '&gt;';
-	            break;
-	          case '\\':
-	            text += '&#92;';
-	            break;
-	          default:
-	            text += next.value;
-	        }
+	      if (next.blockType === 'css') cssElem.innerHTML += next.value;
+	      switch (next.value) {
+	        case '\n':
+	          text += '<br>';
+	          break;
+	        case ' ':
+	          text += '&nbsp;';
+	          break;
+	        case '\t':
+	          text += '&nbsp;&nbsp;';
+	          break;
+	        case '<':
+	          text += '&lt;';
+	          break;
+	        case '>':
+	          text += '&gt;';
+	          break;
+	        case '\\':
+	          text += '&#92;';
+	          break;
+	        default:
+	          text += next.value;
 	      }
 	      currentBlockType = next.blockType;
 	      section.innerHTML = text + cursor;
@@ -11954,19 +11954,7 @@
 	    };
 	    // p.handles.line = c => console.log(c)
 	    var terminal = null;
-	    p.handles.chunk = function (chunk, p) {
-	      switch (chunk.blockType) {
-	        case 'js':
-	          var ctx = _this.ctx; //use var to avoid babel transform
-	          var context = _this.ctx;
-	          eval(chunk.value);
-	          break;
-	        case 'html':
-	          text += '<div>' + chunk.value + '</div>';
-	          section.innerHTML = text;
-	          screen.scrollTop = screen.scrollHeight;
-	      }
-	    };
+	    p.handles.chunk = function (chunk, p) {};
 
 	    p.handles.line = function (line, p) {
 	      switch (line.blockType) {
@@ -12035,12 +12023,11 @@
 	        case 'html':
 	          p.delay = htmlSpeed;
 	          newSection('code', 'htmlcode');
+	          break;
 	        case 'text':
 	          p.delay = textSpeed;
 	          newSection('div');
 	          break;
-	        //pass through
-	        case 'mark':
 	        default:
 	          p.delay = textSpeed;
 	          break;
@@ -12053,6 +12040,17 @@
 	    };
 
 	    p.handles.blockEnded = function (block, p) {
+	      switch (block.blockType) {
+	        case 'js':
+	          var ctx = _this.ctx; //use var to avoid babel transform
+	          var context = _this.ctx;
+	          eval(block.value);
+	          break;
+	        case 'html':
+	          text += '<div>' + block.value + '</div>';
+	          section.innerHTML = text;
+	          screen.scrollTop = screen.scrollHeight;
+	      }
 	      _this.clearTask();
 	    };
 
@@ -14047,7 +14045,7 @@
 
 
 	// module
-	exports.push([module.id, ".text, #glitchText {\n  -webkit-filter: url(\"#glitchFilter\");\n          filter: url(\"#glitchFilter\"); }\n\n.text {\n  display: inline-block; }\n\n#glitchText {\n  font-size: 200px;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  font-family: monospace;\n  margin: 0 auto;\n  display: inline-block;\n  text-align: center;\n  color: white; }\n\n@-webkit-keyframes noise-anim {\n  0% {\n    clip: rect(115px, 999px, 71px, 0); }\n  3.33333% {\n    clip: rect(34px, 999px, 68px, 0); }\n  6.66667% {\n    clip: rect(199px, 999px, 78px, 0); }\n  10% {\n    clip: rect(142px, 999px, 40px, 0); }\n  13.33333% {\n    clip: rect(122px, 999px, 200px, 0); }\n  16.66667% {\n    clip: rect(179px, 999px, 10px, 0); }\n  20% {\n    clip: rect(58px, 999px, 24px, 0); }\n  23.33333% {\n    clip: rect(105px, 999px, 102px, 0); }\n  26.66667% {\n    clip: rect(179px, 999px, 54px, 0); }\n  30% {\n    clip: rect(86px, 999px, 152px, 0); }\n  33.33333% {\n    clip: rect(77px, 999px, 52px, 0); }\n  36.66667% {\n    clip: rect(195px, 999px, 9px, 0); }\n  40% {\n    clip: rect(177px, 999px, 195px, 0); }\n  43.33333% {\n    clip: rect(45px, 999px, 156px, 0); }\n  46.66667% {\n    clip: rect(161px, 999px, 57px, 0); }\n  50% {\n    clip: rect(64px, 999px, 52px, 0); }\n  53.33333% {\n    clip: rect(2px, 999px, 148px, 0); }\n  56.66667% {\n    clip: rect(191px, 999px, 56px, 0); }\n  60% {\n    clip: rect(125px, 999px, 160px, 0); }\n  63.33333% {\n    clip: rect(126px, 999px, 87px, 0); }\n  66.66667% {\n    clip: rect(184px, 999px, 124px, 0); }\n  70% {\n    clip: rect(80px, 999px, 16px, 0); }\n  73.33333% {\n    clip: rect(17px, 999px, 107px, 0); }\n  76.66667% {\n    clip: rect(52px, 999px, 18px, 0); }\n  80% {\n    clip: rect(44px, 999px, 131px, 0); }\n  83.33333% {\n    clip: rect(95px, 999px, 13px, 0); }\n  86.66667% {\n    clip: rect(64px, 999px, 111px, 0); }\n  90% {\n    clip: rect(166px, 999px, 65px, 0); }\n  93.33333% {\n    clip: rect(4px, 999px, 111px, 0); }\n  96.66667% {\n    clip: rect(184px, 999px, 177px, 0); }\n  100% {\n    clip: rect(172px, 999px, 5px, 0); } }\n\n@keyframes noise-anim {\n  0% {\n    clip: rect(115px, 999px, 71px, 0); }\n  3.33333% {\n    clip: rect(34px, 999px, 68px, 0); }\n  6.66667% {\n    clip: rect(199px, 999px, 78px, 0); }\n  10% {\n    clip: rect(142px, 999px, 40px, 0); }\n  13.33333% {\n    clip: rect(122px, 999px, 200px, 0); }\n  16.66667% {\n    clip: rect(179px, 999px, 10px, 0); }\n  20% {\n    clip: rect(58px, 999px, 24px, 0); }\n  23.33333% {\n    clip: rect(105px, 999px, 102px, 0); }\n  26.66667% {\n    clip: rect(179px, 999px, 54px, 0); }\n  30% {\n    clip: rect(86px, 999px, 152px, 0); }\n  33.33333% {\n    clip: rect(77px, 999px, 52px, 0); }\n  36.66667% {\n    clip: rect(195px, 999px, 9px, 0); }\n  40% {\n    clip: rect(177px, 999px, 195px, 0); }\n  43.33333% {\n    clip: rect(45px, 999px, 156px, 0); }\n  46.66667% {\n    clip: rect(161px, 999px, 57px, 0); }\n  50% {\n    clip: rect(64px, 999px, 52px, 0); }\n  53.33333% {\n    clip: rect(2px, 999px, 148px, 0); }\n  56.66667% {\n    clip: rect(191px, 999px, 56px, 0); }\n  60% {\n    clip: rect(125px, 999px, 160px, 0); }\n  63.33333% {\n    clip: rect(126px, 999px, 87px, 0); }\n  66.66667% {\n    clip: rect(184px, 999px, 124px, 0); }\n  70% {\n    clip: rect(80px, 999px, 16px, 0); }\n  73.33333% {\n    clip: rect(17px, 999px, 107px, 0); }\n  76.66667% {\n    clip: rect(52px, 999px, 18px, 0); }\n  80% {\n    clip: rect(44px, 999px, 131px, 0); }\n  83.33333% {\n    clip: rect(95px, 999px, 13px, 0); }\n  86.66667% {\n    clip: rect(64px, 999px, 111px, 0); }\n  90% {\n    clip: rect(166px, 999px, 65px, 0); }\n  93.33333% {\n    clip: rect(4px, 999px, 111px, 0); }\n  96.66667% {\n    clip: rect(184px, 999px, 177px, 0); }\n  100% {\n    clip: rect(172px, 999px, 5px, 0); } }\n\n@-webkit-keyframes noise-anim-2 {\n  0% {\n    clip: rect(1410px, 9999px, 1254px, 0); }\n  3.33333% {\n    clip: rect(965px, 9999px, 1248px, 0); }\n  6.66667% {\n    clip: rect(761px, 9999px, 1613px, 0); }\n  10% {\n    clip: rect(700px, 9999px, 1061px, 0); }\n  13.33333% {\n    clip: rect(1552px, 9999px, 552px, 0); }\n  16.66667% {\n    clip: rect(378px, 9999px, 1109px, 0); }\n  20% {\n    clip: rect(93px, 9999px, 1643px, 0); }\n  23.33333% {\n    clip: rect(645px, 9999px, 1884px, 0); }\n  26.66667% {\n    clip: rect(618px, 9999px, 1164px, 0); }\n  30% {\n    clip: rect(1069px, 9999px, 292px, 0); }\n  33.33333% {\n    clip: rect(1951px, 9999px, 1289px, 0); }\n  36.66667% {\n    clip: rect(334px, 9999px, 435px, 0); }\n  40% {\n    clip: rect(525px, 9999px, 1784px, 0); }\n  43.33333% {\n    clip: rect(638px, 9999px, 883px, 0); }\n  46.66667% {\n    clip: rect(859px, 9999px, 735px, 0); }\n  50% {\n    clip: rect(380px, 9999px, 37px, 0); }\n  53.33333% {\n    clip: rect(1873px, 9999px, 1657px, 0); }\n  56.66667% {\n    clip: rect(1794px, 9999px, 439px, 0); }\n  60% {\n    clip: rect(1208px, 9999px, 150px, 0); }\n  63.33333% {\n    clip: rect(643px, 9999px, 1725px, 0); }\n  66.66667% {\n    clip: rect(636px, 9999px, 1094px, 0); }\n  70% {\n    clip: rect(1475px, 9999px, 805px, 0); }\n  73.33333% {\n    clip: rect(1430px, 9999px, 529px, 0); }\n  76.66667% {\n    clip: rect(291px, 9999px, 1583px, 0); }\n  80% {\n    clip: rect(1567px, 9999px, 949px, 0); }\n  83.33333% {\n    clip: rect(1196px, 9999px, 1594px, 0); }\n  86.66667% {\n    clip: rect(192px, 9999px, 464px, 0); }\n  90% {\n    clip: rect(97px, 9999px, 654px, 0); }\n  93.33333% {\n    clip: rect(816px, 9999px, 791px, 0); }\n  96.66667% {\n    clip: rect(1211px, 9999px, 1928px, 0); }\n  100% {\n    clip: rect(166px, 9999px, 39px, 0); } }\n\n@keyframes noise-anim-2 {\n  0% {\n    clip: rect(1410px, 9999px, 1254px, 0); }\n  3.33333% {\n    clip: rect(965px, 9999px, 1248px, 0); }\n  6.66667% {\n    clip: rect(761px, 9999px, 1613px, 0); }\n  10% {\n    clip: rect(700px, 9999px, 1061px, 0); }\n  13.33333% {\n    clip: rect(1552px, 9999px, 552px, 0); }\n  16.66667% {\n    clip: rect(378px, 9999px, 1109px, 0); }\n  20% {\n    clip: rect(93px, 9999px, 1643px, 0); }\n  23.33333% {\n    clip: rect(645px, 9999px, 1884px, 0); }\n  26.66667% {\n    clip: rect(618px, 9999px, 1164px, 0); }\n  30% {\n    clip: rect(1069px, 9999px, 292px, 0); }\n  33.33333% {\n    clip: rect(1951px, 9999px, 1289px, 0); }\n  36.66667% {\n    clip: rect(334px, 9999px, 435px, 0); }\n  40% {\n    clip: rect(525px, 9999px, 1784px, 0); }\n  43.33333% {\n    clip: rect(638px, 9999px, 883px, 0); }\n  46.66667% {\n    clip: rect(859px, 9999px, 735px, 0); }\n  50% {\n    clip: rect(380px, 9999px, 37px, 0); }\n  53.33333% {\n    clip: rect(1873px, 9999px, 1657px, 0); }\n  56.66667% {\n    clip: rect(1794px, 9999px, 439px, 0); }\n  60% {\n    clip: rect(1208px, 9999px, 150px, 0); }\n  63.33333% {\n    clip: rect(643px, 9999px, 1725px, 0); }\n  66.66667% {\n    clip: rect(636px, 9999px, 1094px, 0); }\n  70% {\n    clip: rect(1475px, 9999px, 805px, 0); }\n  73.33333% {\n    clip: rect(1430px, 9999px, 529px, 0); }\n  76.66667% {\n    clip: rect(291px, 9999px, 1583px, 0); }\n  80% {\n    clip: rect(1567px, 9999px, 949px, 0); }\n  83.33333% {\n    clip: rect(1196px, 9999px, 1594px, 0); }\n  86.66667% {\n    clip: rect(192px, 9999px, 464px, 0); }\n  90% {\n    clip: rect(97px, 9999px, 654px, 0); }\n  93.33333% {\n    clip: rect(816px, 9999px, 791px, 0); }\n  96.66667% {\n    clip: rect(1211px, 9999px, 1928px, 0); }\n  100% {\n    clip: rect(166px, 9999px, 39px, 0); } }\n", ""]);
+	exports.push([module.id, ".text, #glitchText {\n  -webkit-filter: url(\"#glitchFilter\");\n          filter: url(\"#glitchFilter\"); }\n\n.text {\n  display: inline-block; }\n\n#glitchText {\n  font-size: 200px;\n  position: fixed;\n  top: 0px;\n  right: 0px;\n  font-family: monospace;\n  margin: 0 auto;\n  display: inline-block;\n  text-align: center;\n  color: white; }\n\n@-webkit-keyframes noise-anim {\n  0% {\n    clip: rect(104px, 999px, 187px, 0); }\n  3.33333% {\n    clip: rect(132px, 999px, 12px, 0); }\n  6.66667% {\n    clip: rect(191px, 999px, 72px, 0); }\n  10% {\n    clip: rect(170px, 999px, 199px, 0); }\n  13.33333% {\n    clip: rect(82px, 999px, 34px, 0); }\n  16.66667% {\n    clip: rect(93px, 999px, 193px, 0); }\n  20% {\n    clip: rect(41px, 999px, 158px, 0); }\n  23.33333% {\n    clip: rect(7px, 999px, 65px, 0); }\n  26.66667% {\n    clip: rect(178px, 999px, 88px, 0); }\n  30% {\n    clip: rect(72px, 999px, 155px, 0); }\n  33.33333% {\n    clip: rect(5px, 999px, 167px, 0); }\n  36.66667% {\n    clip: rect(104px, 999px, 15px, 0); }\n  40% {\n    clip: rect(136px, 999px, 97px, 0); }\n  43.33333% {\n    clip: rect(183px, 999px, 48px, 0); }\n  46.66667% {\n    clip: rect(12px, 999px, 168px, 0); }\n  50% {\n    clip: rect(84px, 999px, 199px, 0); }\n  53.33333% {\n    clip: rect(69px, 999px, 42px, 0); }\n  56.66667% {\n    clip: rect(87px, 999px, 96px, 0); }\n  60% {\n    clip: rect(17px, 999px, 15px, 0); }\n  63.33333% {\n    clip: rect(160px, 999px, 169px, 0); }\n  66.66667% {\n    clip: rect(29px, 999px, 111px, 0); }\n  70% {\n    clip: rect(197px, 999px, 163px, 0); }\n  73.33333% {\n    clip: rect(171px, 999px, 39px, 0); }\n  76.66667% {\n    clip: rect(107px, 999px, 17px, 0); }\n  80% {\n    clip: rect(78px, 999px, 59px, 0); }\n  83.33333% {\n    clip: rect(34px, 999px, 129px, 0); }\n  86.66667% {\n    clip: rect(96px, 999px, 121px, 0); }\n  90% {\n    clip: rect(106px, 999px, 200px, 0); }\n  93.33333% {\n    clip: rect(93px, 999px, 175px, 0); }\n  96.66667% {\n    clip: rect(200px, 999px, 69px, 0); }\n  100% {\n    clip: rect(1px, 999px, 193px, 0); } }\n\n@keyframes noise-anim {\n  0% {\n    clip: rect(104px, 999px, 187px, 0); }\n  3.33333% {\n    clip: rect(132px, 999px, 12px, 0); }\n  6.66667% {\n    clip: rect(191px, 999px, 72px, 0); }\n  10% {\n    clip: rect(170px, 999px, 199px, 0); }\n  13.33333% {\n    clip: rect(82px, 999px, 34px, 0); }\n  16.66667% {\n    clip: rect(93px, 999px, 193px, 0); }\n  20% {\n    clip: rect(41px, 999px, 158px, 0); }\n  23.33333% {\n    clip: rect(7px, 999px, 65px, 0); }\n  26.66667% {\n    clip: rect(178px, 999px, 88px, 0); }\n  30% {\n    clip: rect(72px, 999px, 155px, 0); }\n  33.33333% {\n    clip: rect(5px, 999px, 167px, 0); }\n  36.66667% {\n    clip: rect(104px, 999px, 15px, 0); }\n  40% {\n    clip: rect(136px, 999px, 97px, 0); }\n  43.33333% {\n    clip: rect(183px, 999px, 48px, 0); }\n  46.66667% {\n    clip: rect(12px, 999px, 168px, 0); }\n  50% {\n    clip: rect(84px, 999px, 199px, 0); }\n  53.33333% {\n    clip: rect(69px, 999px, 42px, 0); }\n  56.66667% {\n    clip: rect(87px, 999px, 96px, 0); }\n  60% {\n    clip: rect(17px, 999px, 15px, 0); }\n  63.33333% {\n    clip: rect(160px, 999px, 169px, 0); }\n  66.66667% {\n    clip: rect(29px, 999px, 111px, 0); }\n  70% {\n    clip: rect(197px, 999px, 163px, 0); }\n  73.33333% {\n    clip: rect(171px, 999px, 39px, 0); }\n  76.66667% {\n    clip: rect(107px, 999px, 17px, 0); }\n  80% {\n    clip: rect(78px, 999px, 59px, 0); }\n  83.33333% {\n    clip: rect(34px, 999px, 129px, 0); }\n  86.66667% {\n    clip: rect(96px, 999px, 121px, 0); }\n  90% {\n    clip: rect(106px, 999px, 200px, 0); }\n  93.33333% {\n    clip: rect(93px, 999px, 175px, 0); }\n  96.66667% {\n    clip: rect(200px, 999px, 69px, 0); }\n  100% {\n    clip: rect(1px, 999px, 193px, 0); } }\n\n@-webkit-keyframes noise-anim-2 {\n  0% {\n    clip: rect(1225px, 9999px, 1618px, 0); }\n  3.33333% {\n    clip: rect(1821px, 9999px, 73px, 0); }\n  6.66667% {\n    clip: rect(1226px, 9999px, 1364px, 0); }\n  10% {\n    clip: rect(1618px, 9999px, 469px, 0); }\n  13.33333% {\n    clip: rect(747px, 9999px, 1568px, 0); }\n  16.66667% {\n    clip: rect(1093px, 9999px, 394px, 0); }\n  20% {\n    clip: rect(1600px, 9999px, 527px, 0); }\n  23.33333% {\n    clip: rect(1190px, 9999px, 469px, 0); }\n  26.66667% {\n    clip: rect(1171px, 9999px, 1465px, 0); }\n  30% {\n    clip: rect(270px, 9999px, 174px, 0); }\n  33.33333% {\n    clip: rect(1730px, 9999px, 318px, 0); }\n  36.66667% {\n    clip: rect(956px, 9999px, 899px, 0); }\n  40% {\n    clip: rect(869px, 9999px, 14px, 0); }\n  43.33333% {\n    clip: rect(138px, 9999px, 1695px, 0); }\n  46.66667% {\n    clip: rect(1275px, 9999px, 1783px, 0); }\n  50% {\n    clip: rect(485px, 9999px, 789px, 0); }\n  53.33333% {\n    clip: rect(703px, 9999px, 357px, 0); }\n  56.66667% {\n    clip: rect(788px, 9999px, 1443px, 0); }\n  60% {\n    clip: rect(1163px, 9999px, 1995px, 0); }\n  63.33333% {\n    clip: rect(490px, 9999px, 1111px, 0); }\n  66.66667% {\n    clip: rect(923px, 9999px, 1217px, 0); }\n  70% {\n    clip: rect(851px, 9999px, 51px, 0); }\n  73.33333% {\n    clip: rect(1702px, 9999px, 898px, 0); }\n  76.66667% {\n    clip: rect(1330px, 9999px, 1844px, 0); }\n  80% {\n    clip: rect(505px, 9999px, 1739px, 0); }\n  83.33333% {\n    clip: rect(1200px, 9999px, 1832px, 0); }\n  86.66667% {\n    clip: rect(414px, 9999px, 1082px, 0); }\n  90% {\n    clip: rect(1580px, 9999px, 1531px, 0); }\n  93.33333% {\n    clip: rect(1425px, 9999px, 317px, 0); }\n  96.66667% {\n    clip: rect(273px, 9999px, 160px, 0); }\n  100% {\n    clip: rect(1844px, 9999px, 1250px, 0); } }\n\n@keyframes noise-anim-2 {\n  0% {\n    clip: rect(1225px, 9999px, 1618px, 0); }\n  3.33333% {\n    clip: rect(1821px, 9999px, 73px, 0); }\n  6.66667% {\n    clip: rect(1226px, 9999px, 1364px, 0); }\n  10% {\n    clip: rect(1618px, 9999px, 469px, 0); }\n  13.33333% {\n    clip: rect(747px, 9999px, 1568px, 0); }\n  16.66667% {\n    clip: rect(1093px, 9999px, 394px, 0); }\n  20% {\n    clip: rect(1600px, 9999px, 527px, 0); }\n  23.33333% {\n    clip: rect(1190px, 9999px, 469px, 0); }\n  26.66667% {\n    clip: rect(1171px, 9999px, 1465px, 0); }\n  30% {\n    clip: rect(270px, 9999px, 174px, 0); }\n  33.33333% {\n    clip: rect(1730px, 9999px, 318px, 0); }\n  36.66667% {\n    clip: rect(956px, 9999px, 899px, 0); }\n  40% {\n    clip: rect(869px, 9999px, 14px, 0); }\n  43.33333% {\n    clip: rect(138px, 9999px, 1695px, 0); }\n  46.66667% {\n    clip: rect(1275px, 9999px, 1783px, 0); }\n  50% {\n    clip: rect(485px, 9999px, 789px, 0); }\n  53.33333% {\n    clip: rect(703px, 9999px, 357px, 0); }\n  56.66667% {\n    clip: rect(788px, 9999px, 1443px, 0); }\n  60% {\n    clip: rect(1163px, 9999px, 1995px, 0); }\n  63.33333% {\n    clip: rect(490px, 9999px, 1111px, 0); }\n  66.66667% {\n    clip: rect(923px, 9999px, 1217px, 0); }\n  70% {\n    clip: rect(851px, 9999px, 51px, 0); }\n  73.33333% {\n    clip: rect(1702px, 9999px, 898px, 0); }\n  76.66667% {\n    clip: rect(1330px, 9999px, 1844px, 0); }\n  80% {\n    clip: rect(505px, 9999px, 1739px, 0); }\n  83.33333% {\n    clip: rect(1200px, 9999px, 1832px, 0); }\n  86.66667% {\n    clip: rect(414px, 9999px, 1082px, 0); }\n  90% {\n    clip: rect(1580px, 9999px, 1531px, 0); }\n  93.33333% {\n    clip: rect(1425px, 9999px, 317px, 0); }\n  96.66667% {\n    clip: rect(273px, 9999px, 160px, 0); }\n  100% {\n    clip: rect(1844px, 9999px, 1250px, 0); } }\n", ""]);
 
 	// exports
 
@@ -14073,10 +14071,10 @@
 	exports = module.exports = __webpack_require__(80)();
 	// imports
 	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=VT323);", ""]);
-	exports.push([module.id, "@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400);", ""]);
+	exports.push([module.id, "@import url(https://fonts.googleapis.com/css?family=Overpass+Mono);", ""]);
 
 	// module
-	exports.push([module.id, "body{\n  margin: 0;\n}\n#app{\n  width: 100vw;\n  height: 100vh;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 14px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n.screen{\n  box-sizing: border-box;\n  font-family: monospace;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word\n  /*word-wrap: break-word;*/\n}\n.screen::-webkit-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-webkit-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-moz-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-moz-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-ms-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-ms-scrollbar-thumb{\n  background-color: #00403E;\n}\n.htmlcode {\n  color: white;\n  font-size: 14px;\n  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);\n}\n.control {\n  position: fixed;\n  top: 4px;\n  font-size: 20px;\n  color: eee;\n  right: 100px;\n}\n.skippedIntro {\n  margin: 4px;\n  font-family: 'Source Code Pro';\n  font-size: 20px;\n  color: #ccc;\n}\n@-webkit-keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n@keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n.parsingCursor {\n  border-right: none;\n  width: 0;\n  -webkit-animation-name: blink;\n          animation-name: blink;\n  -webkit-animation-iteration-count: infinite;\n          animation-iteration-count: infinite;\n  -webkit-animation-duration: 1s;\n          animation-duration: 1s;\n}\n", ""]);
+	exports.push([module.id, "body{\n  margin: 0;\n}\n#app{\n  width: 100vw;\n  height: 100vh;\n}\n#main{\n  z-index: 1000;\n}\n#terminal{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n\tfont-size: 14px;\n\tletter-spacing: 0.15em\n}\n#terminal::-webkit-scrollbar{\n  background: transparent;\n}\n.underlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: -999;\n  pointer-events:none;\n}\n.overlay{\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  margin: 0;\n  z-index: 999;\n  pointer-events:none;\n}\n.screen{\n  box-sizing: border-box;\n  font-family: 'Overpass Mono', monospace;\n  height: 100vh;\n  overflow-y: auto;\n  overflow-wrap: break-word\n}\n.screen::-webkit-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-webkit-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-moz-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-moz-scrollbar-thumb{\n  background-color: #00403E;\n}\n.screen::-ms-scrollbar{\n  width: 8px;\n  background-color: transparent;\n}\n.screen::-ms-scrollbar-thumb{\n  background-color: #00403E;\n}\n.control {\n  position: fixed;\n  font-family: 'Overpass Mono', monospace;\n  top: 6px;\n  font-size: 15px;\n  right: 80px;\n  padding:10px;\n  margin:8px auto;\n  background:#62658a;\n  color:#fff;\n  text-shadow:1px 1px 0 rgba(0,0,0,0.2);\n  box-shadow:3px 3px 0 rgba(0,0,0,0.4);\n}\n.control a{\n  display:inline-block;\n  text-decoration:none;\n  -webkit-transition: all 0.2s;\n  transition:all 0.2s;\n  color:#b299ff;\n  padding:1px;\n  background:rgba(0,0,0,0.2)\n}\n.control a:hover{\n  background:rgba(0,0,0,0.4);\n  border:0\n}\n.control a:before{\n  content:\"[ \";\n  color:#eee\n}\n.control a:after{\n  content:\" ]\";\n  color:#eee\n}\n.skippedIntro {\n  margin: 4px;\n  font-size: 20px;\n  background-color: red;\n  color: #fff;\n}\n@-webkit-keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n@keyframes blink {\n    0% {border-left: 3px solid #1718c4;}\n    50% {border-left: 3px solid #1718c4;}\n    51% {border-left: 0px;}\n    100% {border-left: 0px;}\n}\n.parsingCursor {\n  border-right: none;\n  width: 0;\n  -webkit-animation-name: blink;\n          animation-name: blink;\n  -webkit-animation-iteration-count: infinite;\n          animation-iteration-count: infinite;\n  -webkit-animation-duration: 1s;\n          animation-duration: 1s;\n}\n", ""]);
 
 	// exports
 
@@ -14752,13 +14750,13 @@
 /* 232 */
 /***/ function(module, exports) {
 
-	module.exports = "```js\n  ctx.title.appendText('R')\n```\n\n```js\n  ctx.title.appendText('Y')\n```\n\n```js\n  ctx.title.appendText('X')\n```\n\n```js\n  ctx.title.startRandomMotion()\n```\n\nOoops......\n\n```js\n  console.log(\"The tripleDosedSpaceBananaCat is drifting away.....\")\n```\n\nThis page is still under construction.......\n"
+	module.exports = "```js\n  ctx.title.appendText('R')\n```\n```js\n  ctx.title.appendText('Y')\n```\n```js\n  ctx.title.appendText('X')\n```\n```js\n  ctx.title.startRandomMotion()\n```\n\nOoops......\n\n```js\n  console.log(\"The tripleDosedSpaceBananaCat is drifting away.....\")\n```\n\nThis page is still under construction.....\n"
 
 /***/ },
 /* 233 */
 /***/ function(module, exports) {
 
-	module.exports = "Looked around, you have, I would say, hmmm?\n```html\n<img height='200px' src='assets/yoda.gif'/>\n```\n```span:comment\n// add, will github icon\n```\n```js\nctx.addGithubIcon()\n```\n@print:test,test,xxx<br>@\n```span:comment\n/*\n * Attaching on upper right, is control buttons,\n * skip or pause the parser over there, you may.\n */\n```\n```js\ndocument.getElementsByTagName(\"body\")[0]\n.insertAdjacentHTML('beforeend', `<div class=\"control\">\n<a href=\"javascript:interpreter.skip()\">skip</a> <a href=\"javascript:interpreter.fastForward()\">fast forward</a>\n<a href=\"javascript:interpreter.pause()\">pause</a> <a href=\"javascript:interpreter.resume()\">resume</a></div>`)\n```\n\n```span:comment\n// Fun this is, yes?\n// Yet, style there is not. Fix it, let us.\n```\n```css\n.screen {padding: 24px 12px;}\n.comment {color: #bc9458; font-style: italic;}\n.jscode{color: #40d8dd; }\n#terminal {color: #eee; background: #000}\n.csscode {color: #e6e1dc;}\n```\n\nYoda is annoying, you think.\nMassaging Yoda...\n@image:yoda_death.gif@\nYoda is now dead. The end.\n\n\nEverything you have seen is dynamically generated, like this:\n```printjs\nlet terminalScreen = document.getElementById('terminal')\nlet screen = document.getElementsByClassName(\"screen\")[0]\nlet terminal = ReactDOM.render((\n  <Terminal/>\n), document.getElementById(\"termdock\"))\n@initTerminal@\n```\nYou can drag or resize this terminal.\n\n```printjs\nterminal.injectContent(terminalScreen)\n@injectContent@\n```\n\nChapter Introduction Complete!\n"
+	module.exports = "Looked around, you have, I would say, hmmm?\n```html\n<img height='200px' src='assets/yoda.gif'/>\n```\n```span:comment\n// add, will github icon\n```\n```js\nctx.addGithubIcon()\n```\n```span:comment\n/*\n * Attaching on upper right, is control buttons,\n * skip or pause the parser over there, you may.\n */\n```\n```js\ndocument.getElementsByTagName(\"body\")[0]\n.insertAdjacentHTML('beforeend', `<div class=\"control\">\n<a href=\"javascript:interpreter.skip()\">skip</a> <a href=\"javascript:interpreter.fastForward()\">fast forward</a>\n<a href=\"javascript:interpreter.pause()\">pause</a> <a href=\"javascript:interpreter.resume()\">resume</a></div>`)\n```\n\n```span:comment\n// Fun this is, yes?\n// Yet, style there is not. Fix it, let us.\n```\n```css\n.screen {padding: 24px 12px;}\n.comment {color: #bc9458; font-style: italic;}\n.jscode{color: #40d8dd; }\n.htmlcode{color: b37775;}\n#terminal {color: #eee; background: #000}\n.csscode {color: #e6e1dc;}\n```\n\nYoda is annoying, you think.\nMassaging Yoda...\n@image:yoda_death.gif@\nYoda is now dead. The end.\n\nEverything you have seen is dynamically generated, like this:\n```printjs\nlet terminal = ReactDOM.render((\n  <Terminal/>\n), document.getElementById(\"termdock\"))\n@initTerminal@\n```\nYou can drag or resize this terminal.\n\n```printjs\nterminal.injectContent(terminalScreen)\n@injectContent@\n```\n\nChapter Introduction Complete!\n"
 
 /***/ },
 /* 234 */
@@ -26440,8 +26438,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./preload.css", function() {
-				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./preload.css");
+			module.hot.accept("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./intro.css", function() {
+				var newContent = require("!!./../../../node_modules/css-loader/index.js!./../../../node_modules/postcss-loader/index.js!./intro.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
