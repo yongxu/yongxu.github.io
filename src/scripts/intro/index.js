@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 import Terminal from "terminal"
 import addGithubIcon from 'addGithubIcon'
 
-require('./preload.css')
+require('./intro.css')
 
 export default function(interpreter){
 //  interpreter.addCommandListener('tttest', (a,b,c) => console.log(""+a+b+c))
@@ -11,5 +11,5 @@ export default function(interpreter){
   interpreter.injectContext({
     addGithubIcon
   })
-  return interpreter.run(require('raw!./prelude.txt'))
+  return interpreter.run(require('raw!./intro.txt'))
 }

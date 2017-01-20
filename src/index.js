@@ -5,5 +5,5 @@ import Interpreter from './interpreter'
 
 const interpreter = new Interpreter
 window.interpreter = interpreter
-require('scripts/prelude')(interpreter)
+require('scripts/intro')(interpreter)
 .then(require('scripts/home'))

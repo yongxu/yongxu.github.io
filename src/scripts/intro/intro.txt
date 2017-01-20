@@ -8,7 +8,6 @@ Looked around, you have, I would say, hmmm?
 ```js
 ctx.addGithubIcon()
 ```
-@print:test,test,xxx<br>@
 ```span:comment
 /*
  * Attaching on upper right, is control buttons,
@@ -30,6 +29,7 @@ document.getElementsByTagName("body")[0]
 .screen {padding: 24px 12px;}
 .comment {color: #bc9458; font-style: italic;}
 .jscode{color: #40d8dd; }
+.htmlcode{color: b37775;}
 #terminal {color: #eee; background: #000}
 .csscode {color: #e6e1dc;}
 ```
@@ -39,11 +39,8 @@ Massaging Yoda...
 @image:yoda_death.gif@
 Yoda is now dead. The end.
 
-
 Everything you have seen is dynamically generated, like this:
 ```printjs
-let terminalScreen = document.getElementById('terminal')
-let screen = document.getElementsByClassName("screen")[0]
 let terminal = ReactDOM.render((
   <Terminal/>
 ), document.getElementById("termdock"))

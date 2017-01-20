@@ -1,5 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=VT323);
-@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:400);
+@import url(https://fonts.googleapis.com/css?family=Overpass+Mono);
 
 body{
   margin: 0;
@@ -53,11 +53,10 @@ $scrollBarWidth: 8px;
 
 .screen{
   box-sizing: border-box;
-  font-family: monospace;
+  font-family: 'Overpass Mono', monospace;
   height: 100vh;
   overflow-y: auto;
   overflow-wrap: break-word;
-  /*word-wrap: break-word;*/
   &::-webkit-scrollbar{
     width: $scrollBarWidth;
     background-color: transparent;
@@ -81,25 +80,39 @@ $scrollBarWidth: 8px;
   }
 }
 
-.htmlcode {
-  color: white;
-  font-size: 14px;
-  text-shadow: 0 0 2px rgba(31, 240, 66, 0.75);
-}
-
 .control {
   position: fixed;
-  top: 4px;
-  font-size: 20px;
-  color: eee;
-  right: 100px;
+  font-family: 'Overpass Mono', monospace;
+  top: 6px;
+  font-size: 15px;
+  right: 80px;
+  padding:10px;
+  margin:8px auto;
+  background:#62658a;
+  color:#fff;
+  text-shadow:1px 1px 0 rgba(0,0,0,0.2);
+  box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+  a{
+    display:inline-block;
+    text-decoration:none;
+    transition:all 0.2s;
+    color:#b299ff;
+    padding:1px;
+    background:rgba(0,0,0,0.2)
+  }
+  a:hover{
+    background:rgba(0,0,0,0.4);
+    border:0
+  }
+  a:before{content:"[ ";color:#eee}
+  a:after{content:" ]";color:#eee}
 }
 
 .skippedIntro {
   margin: 4px;
-  font-family: 'Source Code Pro';
   font-size: 20px;
-  color: #ccc;
+  background-color: red;
+  color: #fff;
 }
 
 @keyframes blink {

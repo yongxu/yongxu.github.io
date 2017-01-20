@@ -65,30 +65,28 @@ export default class Interpreter {
     let p = new Parser
     p.delay = textSpeed
     p.handles.char = (next, parser) => {
-      if (next.blockType !== 'mark') {
-        if (next.blockType === 'css') cssElem.innerHTML += next.value
-        switch (next.value) {
-          case '\n':
-            text += '<br>'
-            break
-          case ' ':
-            text += '&nbsp;'
-            break
-          case '\t':
-            text += '&nbsp;&nbsp;'
-            break
-          case '<':
-            text += '&lt;'
-            break
-          case '>':
-            text += '&gt;'
-            break
-          case '\\':
-            text += '&#92;'
-            break
-          default:
-            text += next.value
-        }
+      if (next.blockType === 'css') cssElem.innerHTML += next.value
+      switch (next.value) {
+        case '\n':
+          text += '<br>'
+          break
+        case ' ':
+          text += '&nbsp;'
+          break
+        case '\t':
+          text += '&nbsp;&nbsp;'
+          break
+        case '<':
+          text += '&lt;'
+          break
+        case '>':
+          text += '&gt;'
+          break
+        case '\\':
+          text += '&#92;'
+          break
+        default:
+          text += next.value
       }
       currentBlockType = next.blockType
       section.innerHTML = text + cursor
@@ -97,17 +95,6 @@ export default class Interpreter {
     // p.handles.line = c => console.log(c)
     let terminal = null
     p.handles.chunk = (chunk, p) => {
-      switch (chunk.blockType){
-        case 'js':
-          var ctx = this.ctx //use var to avoid babel transform
-          var context = this.ctx
-      	  eval(chunk.value)
-          break
-        case 'html':
-          text += '<div>' + chunk.value + '</div>'
-          section.innerHTML = text
-          screen.scrollTop = screen.scrollHeight
-      }
     }
 
     p.handles.line = (line, p) => {
@@ -180,12 +167,11 @@ export default class Interpreter {
         case 'html':
           p.delay = htmlSpeed
           newSection('code', 'htmlcode')
+          break
         case 'text':
           p.delay = textSpeed
           newSection('div')
           break
-        //pass through
-        case 'mark':
         default:
           p.delay = textSpeed
           break
@@ -198,6 +184,17 @@ export default class Interpreter {
     }
 
     p.handles.blockEnded = (block, p) => {
+      switch (block.blockType){
+        case 'js':
+          var ctx = this.ctx //use var to avoid babel transform
+          var context = this.ctx
+      	  eval(block.value)
+          break
+        case 'html':
+          text += '<div>' + block.value + '</div>'
+          section.innerHTML = text
+          screen.scrollTop = screen.scrollHeight
+      }
       this.clearTask()
     }
 
@@ -271,10 +268,12 @@ export default class Interpreter {
   }
 
   fastForward = () => {
+    this.parser.pause && this.parser.resume()
     this.parser.fastForward = true
   }
 
   skip = () => {
+    this.parser.pause && this.parser.resume()
     this.parser.addYieldEvent({
       type: 'command',
       command: 'initTerminal'
