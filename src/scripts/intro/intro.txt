@@ -29,7 +29,7 @@ document.getElementsByTagName("body")[0]
 .screen {padding: 24px 12px;}
 .comment {color: #bc9458; font-style: italic;}
 .jscode{color: #40d8dd; }
-.htmlcode{color: b37775;}
+.htmlcode{color: #b37775;}
 #terminal {color: #eee; background: #000}
 .csscode {color: #e6e1dc;}
 ```

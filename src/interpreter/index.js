@@ -162,7 +162,7 @@ export default class Interpreter {
           break
         case 'css':
           p.delay = cssSpeed
-          newSection('code', 'csslcode')
+          newSection('code', 'csscode')
           break
         case 'html':
           p.delay = htmlSpeed
