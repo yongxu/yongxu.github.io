@@ -1,5 +1,5 @@
-import React from "react";
-import DnR from 'react-dnr';
+import React from "react"
+import DnR from 'react-dnr'
 
 const defaultTheme = {
   title: {
@@ -18,17 +18,17 @@ const defaultTheme = {
     padding: 0,
     overflow: 'hidden',
   },
-  transition: 'all 0.25s ease-in-out'
-};
+  transition: 'all 0.20s ease-in'
+}
 
 class Button extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       hover: false,
       down: false,
-    };
+    }
   }
   render() {
     const {
@@ -37,13 +37,13 @@ class Button extends React.Component {
       downStyle,
       children,
       ...other,
-    } = this.props;
+    } = this.props
 
     let buttonStyle = {
       ...style,
       ...(this.state.hover ? hoverStyle : {}),
       ...(this.state.down ? downStyle : {})
-    };
+    }
     return (
       <button
         onMouseEnter={()=>this.setState({hover:true})}
@@ -101,7 +101,7 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
     outline: 'none',
     border: 'none',
     textAlign: 'center'
-  };
+  }
 
   const buttons = {
     style: {
@@ -113,7 +113,7 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
       alignItems: 'center',
       verticalAlign: 'baseline',
     }
-  };
+  }
 
   const closeButton = {
     style: {
@@ -130,7 +130,7 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
       backgroundColor: '#bc4040'
     },
     onClick: onClose
-  };
+  }
 
   const minimizeButton = {
     style: {
@@ -145,7 +145,7 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
       backgroundColor: 'rgba(0, 0, 0, 0.2)'
     },
     onClick: onMinimize
-  };
+  }
 
   const maximizeButton = {
     style: {
@@ -160,7 +160,7 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
       backgroundColor: 'rgba(0, 0, 0, 0.2)',
     },
     onClick: onMaximize
-  };
+  }
   return {
     theme: {
       title: {
@@ -195,18 +195,27 @@ export let TerminalTheme = ({title, onClose, onMinimize, onMaximize, titleBarCol
             {title}
           </div>
       </TitleBar>),
-  };
-};
+  }
+}
 
 export default class Terminal extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.theme = TerminalTheme({
-      title: 'Terminal',
-      onClose: ()=>this.refs.dnr.minimize(),
-      onMinimize: ()=>this.refs.dnr.minimize(),
-      onMaximize: ()=>this.refs.dnr.maximize(),
-    });
+      title: props.title || 'Terminal',
+      onClose: ()=> {
+        props.onClose && props.onClose(this.refs.dnr)
+      },
+      onMinimize: () => {
+        props.onMinimize ? props.onMinimize(this.refs.dnr) : this.refs.dnr.minimize()
+      },
+      onMaximize: () => {
+        props.onMaximize ? props.onMaximize(this.refs.dnr) : this.refs.dnr.maximize()
+      },
+    })
+  }
+  componentDidMount() {
+    this.props.onMounted && this.props.onMounted(this)
   }
   injectContent(node) {
     if (this.node) {
@@ -219,13 +228,16 @@ export default class Terminal extends React.Component {
   render() {
     let node = this.node
     let terminal = this
+    let {
+      style
+    } = this.props
     return (
       <div>
         <DnR
           ref='dnr'
           {...this.theme}
           cursorRemap={(c) => c === 'move' ? 'default' : null}
-          style={{
+          style={style || {
             width: 500,
             height: 400,
             bottom: 0,

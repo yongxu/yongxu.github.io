@@ -1,36 +1,44 @@
-Looked around, you have, I would say, hmmm?
+```span:comment
+// Looked around, you have, I would say, hmmm?
+```
+```js
+interpreter.createWindow('test', {
+  width: 500,
+  height: 400,
+  top: 0,
+  left: 0,
+  position: 'fixed',
+  backgroundColor: '#fff'
+})
+```
 ```html
 <img height='200px' src='assets/yoda.gif'/>
 ```
-```span:comment
-// add, will github icon
+```html:#main
+<div class="control">
+<a>skip</a>
+<a>fast forward</a>
+<a>pause</a>
+<a>resume</a>
+</div>
+```
+```js
+let lastControl = 'resume'
+store.subscribe(state => document.querySelectorAll('.control a').forEach(a => {
+  let m = camelize(a.innerHTML), s = state.interpreterState
+  a.className = (s == 'PAUSED' ? m != 'pause' : m != 'resume') ? 'active' : ''
+  a.onclick = interpreter[m]
+}))
 ```
 ```js
 ctx.addGithubIcon()
 ```
-```span:comment
-/*
- * Attaching on upper right, is control buttons,
- * skip or pause the parser over there, you may.
- */
-```
-```js
-document.getElementsByTagName("body")[0]
-.insertAdjacentHTML('beforeend', `<div class="control">
-<a href="javascript:interpreter.skip()">skip</a> <a href="javascript:interpreter.fastForward()">fast forward</a>
-<a href="javascript:interpreter.pause()">pause</a> <a href="javascript:interpreter.resume()">resume</a></div>`)
-```
-
-```span:comment
-// Fun this is, yes?
-// Yet, style there is not. Fix it, let us.
-```
 ```css
-.screen {padding: 24px 12px;}
 .comment {color: #bc9458; font-style: italic;}
 .jscode{color: #40d8dd; }
 .htmlcode{color: #b37775;}
-#terminal {color: #eee; background: #000}
+#terminal {color: #fff; background: #1b2225}
+.screen {padding: 24px 12px; top: 48px;}
 .csscode {color: #e6e1dc;}
 ```
 
@@ -49,7 +57,7 @@ let terminal = ReactDOM.render((
 You can drag or resize this terminal.
 
 ```printjs
-terminal.injectContent(terminalScreen)
+terminal.injectContent(document.getElementById('terminal'))
 @injectContent@
 ```
 

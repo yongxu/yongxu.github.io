@@ -10,7 +10,7 @@ require('./index.css')
 export default function(interpreter){
   document.getElementsByTagName("body")[0]
   .insertAdjacentHTML('beforeend', '<style>.control{visibility:hidden;}</style>')
-  let app = document.getElementById('app')
+  let app = document.getElementById('main')
   let home = document.createElement('div')
   home.id = 'home'
   app.appendChild(home)

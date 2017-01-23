@@ -2,6 +2,17 @@ import Parser from "parser"
 import React from "react"
 import ReactDOM from "react-dom"
 import Terminal from "terminal"
+import store, { dispatch } from '../store'
+
+
+const interpreterState = (s) => {
+  if (s !== store.getState().interpreterState)
+    dispatch({type: 'INTERPRETER_STATE', state: s})
+}
+const interpreterMode = (s) => {
+  if (s !== store.getState().interpreterMode)
+    dispatch({type: 'INTERPRETER_MODE', mode: s})
+}
 
 const interactiveParsing = true
 const textSpeed = interactiveParsing && 40
@@ -14,6 +25,7 @@ const imageHeight = '200px'
 export default class Interpreter {
   constructor(options) {
     const commandListeners = new Map()
+    this.windows = new Map()
     this.taskQueue = []
     let app = document.getElementById('app')
 
@@ -25,20 +37,21 @@ export default class Interpreter {
     termDock.id = 'termdock'
     app.appendChild(termDock)
 
-    let underlay = document.createElement('div')
-    underlay.classList.add('underlay')
-    el.appendChild(underlay)
-
     let screen = document.createElement('div')
     screen.classList.add('screen')
-    let overlay = document.createElement('div')
-    overlay.classList.add('overlay')
     el.appendChild(screen)
-    el.appendChild(overlay)
     let cssElem = document.createElement('style')
+    this.cssElem = cssElem
     document.body.appendChild(cssElem)
 
+    this.windowsDiv = document.createElement('div')
+    this.windowsDiv.id = 'windows'
+    app.appendChild(this.windowsDiv)
+
+
     let section
+    let htmlSection
+    let htmlString
     let text = ''
     let currentBlockType = 'text'
     const cursor = '<span class="parsingCursor"></span>'
@@ -57,15 +70,17 @@ export default class Interpreter {
       terminate: this.terminate,
       pause: this.pause,
       resume: this.resume,
-      rerun: this.rerun,
       skip: this.skip,
       fastForward: this.fastForward,
-      reset: this.reset
     }
     let p = new Parser
     p.delay = textSpeed
     p.handles.char = (next, parser) => {
       if (next.blockType === 'css') cssElem.innerHTML += next.value
+      if (next.blockType === 'html') {
+        htmlString += next.value
+        htmlSection.innerHTML = htmlString
+      }
       switch (next.value) {
         case '\n':
           text += '<br>'
@@ -123,11 +138,21 @@ export default class Interpreter {
         case 'injectContent':
           if (terminalInjected) break
           terminal.injectContent(el)
+          cssElem.innerHTML = `
+          .comment {color: #bc9458; font-style: italic;}
+          .jscode{color: #40d8dd; }
+          .htmlcode{color: #b37775;}
+          #terminal {color: #fff; background: #1b2225}
+          .screen {padding: 6px 6px 24px 6px; top: 0px;}
+          .csscode {color: #e6e1dc;}`
           let lastHeight = 0
           setInterval(()=>{
             screen.style.height = el.clientHeight + 'px'
           }, 30)
           terminalInjected = true
+          break
+        case 'createWindow':
+          this.createWindow(cmd.params[0], ...cmd.params.slice(1))
           break
         case 'image':
           text += `<img height=${imageHeight} src='${'assets/' + cmd.params[0]}'/><br>`
@@ -147,7 +172,6 @@ export default class Interpreter {
     p.handles.textStarted = (_, p) => {
       p.delay = textSpeed
       newSection('div')
-      screen.scrollTop = screen.scrollHeight
     }
     p.handles.blockStarted = (block, p) => {
       switch (block.blockType) {
@@ -167,6 +191,13 @@ export default class Interpreter {
         case 'html':
           p.delay = htmlSpeed
           newSection('code', 'htmlcode')
+          htmlSection = document.createElement('div')
+          htmlString = ''
+          if (block.params.length) {
+            document.querySelector(block.params[0]).appendChild(htmlSection)
+          } else {
+            screen.appendChild(htmlSection)
+          }
           break
         case 'text':
           p.delay = textSpeed
@@ -191,20 +222,14 @@ export default class Interpreter {
       	  eval(block.value)
           break
         case 'html':
-          text += '<div>' + block.value + '</div>'
-          section.innerHTML = text
+          // text += '<div>' + block.value + '</div>'
+          // section.innerHTML = text
           screen.scrollTop = screen.scrollHeight
       }
       this.clearTask()
     }
 
     p.handles.terminate = (state, p) => {
-      cssElem.innerHTML = `
-      .screen {padding: 24px 12px;}
-      .comment {color: #bc9458; font-style: italic;}
-      .jscode{color: #40d8dd; }
-      #terminal {color: #eee; background: #000}
-      .csscode {color: #e6e1dc;}`
       this.clearTask()
       this.parser.onFinish(p)
     }
@@ -228,9 +253,44 @@ export default class Interpreter {
     return new Promise((resolve, reject) => {
       this.parser.onFinish = () => {
         resolve(this)
+        interpreterState('FINISHED')
       }
+      interpreterState('PARSING')
+      interpreterMode('NORMAL')
       this.parser.parse(script)
     })
+  }
+
+  createWindow(id, style) {
+    let windowDiv = document.createElement('div')
+    this.windowsDiv.appendChild(windowDiv)
+    windowDiv.id = id
+    const closeWindow = () => {
+      this.windows.delete(id)
+      ReactDOM.unmountComponentAtNode(windowDiv)
+      windowDiv.remove()
+    }
+
+    return new Promise((resolve) => {
+      const win = ReactDOM.render((
+        <Terminal
+          title={id}
+          onClose={closeWindow}
+          onMounted={() => {
+            this.windows.set(id, {win, closeWindow})
+            resolve(win)
+          }}
+          style={style}/>
+      ), windowDiv)
+    })
+  }
+
+  getWindow(id) {
+    return this.windows.get(id).win
+  }
+
+  closeWindow(id) {
+    return this.windows.get(id).closeWindow()
   }
 
   injectContext(context) {
@@ -253,23 +313,35 @@ export default class Interpreter {
 
   terminate = () => {
     this.parser.terminate = true
+    interpreterMode('TERMINATED')
   }
 
   pause = () => {
+    interpreterState('PAUSED')
     this.parser.pause = true
+    if (this.parser.fastForward) {
+      this.parser.fastForward = false
+      dispatch({type: 'INTERPRETER_FASTFORWARD', fastForward: false})
+      interpreterMode('NORMAL')
+    }
   }
 
   resume = () => {
-    this.parser.pause && this.parser.resume()
+    if (this.parser.pause) {
+      this.parser.resume()
+      interpreterState('PARSING')
+      interpreterMode('NORMAL')
+    }
   }
 
-  rerun = () => {
-    this.reset()
-  }
-
-  fastForward = () => {
+  fastForward = (fastForward) => {
+    if (typeof fastForward === 'undefined')
+      fastForward = ! this.parser.fastForward
     this.parser.pause && this.parser.resume()
-    this.parser.fastForward = true
+    this.parser.fastForward = fastForward
+    dispatch({type: 'INTERPRETER_FASTFORWARD', fastForward})
+    interpreterMode('FASTFOWARD')
+    interpreterState('PAUSING')
   }
 
   skip = () => {
@@ -288,10 +360,6 @@ export default class Interpreter {
       params: [`<br><span class='skippedIntro'>\nIntroduction skipped!</span><br>\n`]
     })
     this.parser.addYieldEvent('terminate')
-  }
-
-  reset = () => {
-    this.parser.addYieldEvent('reset')
   }
 
   addCommandListener(cmd, f) {

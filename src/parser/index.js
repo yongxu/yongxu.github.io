@@ -24,10 +24,10 @@ export default class Parser {
     } = parser.next()
 
     if (done) return //finished parsing
-
-    if (value.type !== 'char') {
-      console.log(value)
-    }
+    //
+    // if (value.type !== 'char') {
+    //   console.log(value)
+    // }
 
     if (value.type === 'terminate') {
       if (this.s === TOKENS.BLOCK && 'blockEnded' in this.handles) {

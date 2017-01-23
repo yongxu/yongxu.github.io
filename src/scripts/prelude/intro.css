@@ -9,11 +9,8 @@ body{
   width: 100vw;
   height: 100vh;
 }
-
 #main{
-  width: 100vw;
-  height: 100vh;
-  z-index: 10;
+  z-index: 1000;
 }
 
 #terminal{
@@ -57,12 +54,7 @@ $scrollBarWidth: 8px;
 .screen{
   box-sizing: border-box;
   font-family: 'Overpass Mono', monospace;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transition: top 0.5s, right 0.5s, bottom 0.5s, left 0.5s, padding 0.5s;
+  height: 100vh;
   overflow-y: auto;
   overflow-wrap: break-word;
   &::-webkit-scrollbar{
@@ -90,7 +82,6 @@ $scrollBarWidth: 8px;
 
 .control {
   position: fixed;
-  z-index: 2000;
   font-family: 'Overpass Mono', monospace;
   top: 6px;
   font-size: 15px;
@@ -101,20 +92,13 @@ $scrollBarWidth: 8px;
   color:#fff;
   text-shadow:1px 1px 0 rgba(0,0,0,0.2);
   box-shadow:3px 3px 0 rgba(0,0,0,0.4);
-  a {
+  a{
     display:inline-block;
     text-decoration:none;
     transition:all 0.2s;
-    color:#2a0424;
-    padding:1px;
-    background:rgba(0,0,0,0.4);
-    pointer-events: none;
-  }
-  .active {
     color:#b299ff;
-    background:rgba(0,0,0,0.2);
-    cursor: pointer;
-    pointer-events: auto;
+    padding:1px;
+    background:rgba(0,0,0,0.2)
   }
   a:hover{
     background:rgba(0,0,0,0.4);
