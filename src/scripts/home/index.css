@@ -1,5 +1,16 @@
 #home {
-  background-color: #222222;
+  background-color: #000;
   width: 100%;
   height: 100%;
+}
+
+.underlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  /*z-index: -999;*/
+  pointer-events:none;
 }

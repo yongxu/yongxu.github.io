@@ -1,4 +1,8 @@
 ```js
+  let bg = ctx.addBackground(document.querySelector('.underlay'))
+  setInterval(() => bg.reset(), 4000)
+```
+```js
   ctx.title.appendText('R')
 ```
 ```js
@@ -17,4 +21,4 @@ Ooops......
   console.log("The tripleDosedSpaceBananaCat is drifting away.....")
 ```
 
-This page is still under construction.....
+Parsing completed! More is coming soon!

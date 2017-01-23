@@ -272,13 +272,13 @@ export default class Interpreter {
     }
 
     return new Promise((resolve) => {
-      const win = ReactDOM.render((
+      ReactDOM.render((
         <Terminal
           title={id}
           onClose={closeWindow}
-          onMounted={() => {
-            this.windows.set(id, {win, closeWindow})
-            resolve(win)
+          onMounted={(terminal) => {
+            this.windows.set(id, {terminal, closeWindow})
+            resolve(terminal)
           }}
           style={style}/>
       ), windowDiv)

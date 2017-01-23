@@ -2,17 +2,15 @@
 // Looked around, you have, I would say, hmmm?
 ```
 ```js
-interpreter.createWindow('test', {
-  width: 500,
-  height: 400,
-  top: 100,
-  left: 400,
+interpreter.createWindow('Intro', {
+  width: 380,
+  height: 300,
+  top: 80,
+  right: 50,
   position: 'fixed',
-  backgroundColor: '#fff'
-})
-```
-```html
-<img height='200px' src='assets/yoda.gif'/>
+  backgroundColor: '#fff',
+  border: '1px solid rgb(0, 149, 255)',
+}).then(w => ctx.addIntro(w))
 ```
 ```html:#main
 <div class="control">
@@ -30,8 +28,16 @@ store.subscribe(state => document.querySelectorAll('.control a').forEach(a => {
   a.onclick = interpreter[m]
 }))
 ```
+```html
+<img height='200px' src='assets/yoda.gif'/>
+```
 ```js
 ctx.addGithubIcon()
+```
+
+```span:comment
+// Fun this is, yes?
+// Yet, style there is not. Fix it, let us.
 ```
 ```css
 .comment {color: #bc9458; font-style: italic;}
@@ -54,7 +60,7 @@ let terminal = ReactDOM.render((
 ), document.getElementById("termdock"))
 @initTerminal@
 ```
-You can drag or resize this terminal.
+BTW, You can drag or resize this terminal, or any window.
 
 ```printjs
 terminal.injectContent(document.getElementById('terminal'))
